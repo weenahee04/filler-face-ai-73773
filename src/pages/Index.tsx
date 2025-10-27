@@ -2,8 +2,9 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Camera, Upload, Loader2, Sparkles, CheckCircle2, ExternalLink, Download, Share2 } from "lucide-react";
+import { Camera, Upload, Loader2, Sparkles, CheckCircle2, ExternalLink, Download, Share2, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
@@ -29,6 +30,7 @@ const Index = () => {
   const [generatingImage, setGeneratingImage] = useState(false);
   const resultImageRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleBeforeImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -53,7 +55,9 @@ const Index = () => {
     
     console.log('Image hash:', imageHash);
     
-    // Check if this image was analyzed before
+    // TODO: Check if this image was analyzed before
+    // Currently disabled due to missing face_analyses table
+    /*
     const { data: existingAnalysis } = await supabase
       .from('face_analyses')
       .select('*')
@@ -71,6 +75,7 @@ const Index = () => {
       });
       throw new Error('EXISTING_ANALYSIS'); // Special error to stop analysis
     }
+    */
     
     const fileName = `${Date.now()}-${file.name}`;
     const { data, error } = await supabase.storage
@@ -344,13 +349,25 @@ const Index = () => {
 
       {/* Header */}
       <header className="bg-gradient-to-r from-[#E91E8C] to-[#F06292] text-white shadow-lg sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 text-center">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-wide">
-            วิเคราะห์ใบหน้าด้วย AI
-          </h1>
-          <p className="text-sm md:text-base text-white/90 mt-1">
-            AI วิเคราะห์ใบหน้าและแนะนำฟิลเลอร์
-          </p>
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex-1 text-center">
+              <h1 className="text-2xl md:text-3xl font-bold tracking-wide">
+                วิเคราะห์ใบหน้าด้วย AI
+              </h1>
+              <p className="text-sm md:text-base text-white/90 mt-1">
+                AI วิเคราะห์ใบหน้าและแนะนำฟิลเลอร์
+              </p>
+            </div>
+            <Button
+              onClick={() => navigate("/how-to-use")}
+              variant="ghost"
+              className="text-white hover:bg-white/20 flex-shrink-0"
+              title="วิธีการใช้งาน"
+            >
+              <Info className="w-5 h-5" />
+            </Button>
+          </div>
         </div>
       </header>
 
