@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Camera, Upload, Loader2, Sparkles, CheckCircle2, ExternalLink, Download, Share2, Info } from "lucide-react";
+import { Camera, Upload, Loader2, Sparkles, CheckCircle2, ExternalLink, Download, Share2, Info, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -381,6 +381,25 @@ const Index = () => {
             </span>
           </div>
         </div>
+
+        {/* How to Use Card */}
+        <Card 
+          className="mb-6 border-2 border-[#E91E8C]/20 glass-card shadow-card overflow-hidden cursor-pointer hover:shadow-elegant transition-all hover:scale-[1.02]"
+          onClick={() => navigate("/how-to-use")}
+        >
+          <div className="bg-gradient-to-r from-[#F06292] to-[#EC407A] px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                <Info className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-white font-bold text-base">วิธีการใช้งาน</h3>
+                <p className="text-white/90 text-xs">ดูคู่มือการใช้งานแบบละเอียด</p>
+              </div>
+            </div>
+            <ArrowRight className="w-5 h-5 text-white" />
+          </div>
+        </Card>
 
         <div className="mb-6">
           {/* Before Image Upload */}
