@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Camera, Upload, Loader2, Sparkles, CheckCircle2, ExternalLink, Download, Share2, Info, ArrowRight, X } from "lucide-react";
+import { Camera, Upload, Loader2, Sparkles, CheckCircle2, ExternalLink, Download, Share2, Info, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,108 +10,32 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import html2canvas from "html2canvas";
 import { ResultImage } from "@/components/ResultImage";
-
 const Index = () => {
   const [beforeImage, setBeforeImage] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<any>(null);
+  const beforeInputRef = useRef<HTMLInputElement>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string>('');
   const [uploadedImageHash, setUploadedImageHash] = useState<string>('');
   const [showConsent, setShowConsent] = useState(false);
   const [consentAccepted, setConsentAccepted] = useState(false);
   const [generatingImage, setGeneratingImage] = useState(false);
   const resultImageRef = useRef<HTMLDivElement>(null);
-  
-  // Camera states
-  const [cameraActive, setCameraActive] = useState(false);
-  const [stream, setStream] = useState<MediaStream | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const navigate = useNavigate();
-  // Start camera
-  const startCamera = async () => {
-    try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
-        audio: false
-      });
-      setStream(mediaStream);
-      setCameraActive(true);
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-      }
-      toast({
-        title: "✅ เปิดกล้องสำเร็จ",
-        description: "กำลังสแกนใบหน้าอัตโนมัติ..."
-      });
-      
-      // Auto-scan after 3 seconds
-      setTimeout(() => {
-        capturePhoto();
-      }, 3000);
-    } catch (error) {
-      console.error('Error accessing camera:', error);
-      toast({
-        title: "ไม่สามารถเปิดกล้องได้",
-        description: "กรุณาอนุญาตการใช้กล้องในเบราว์เซอร์",
-        variant: "destructive"
-      });
-    }
-  };
-
-  // Stop camera
-  const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-      setStream(null);
-    }
-    setCameraActive(false);
-  };
-
-  // Capture photo from camera
-  const capturePhoto = () => {
-    if (videoRef.current && canvasRef.current) {
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        // Mirror the captured image back to normal
-        ctx.scale(-1, 1);
-        ctx.drawImage(video, -canvas.width, 0);
-        const imageData = canvas.toDataURL('image/jpeg');
-        setBeforeImage(imageData);
+  const handleBeforeImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setBeforeImage(reader.result as string);
         setAnalysis(null);
-        stopCamera();
-        
-        toast({
-          title: "✅ สแกนใบหน้าสำเร็จ",
-          description: "กำลังเริ่มวิเคราะห์ด้วย AI..."
-        });
-        
-        // Auto-analyze after capture
-        setTimeout(() => {
-          if (!consentAccepted) {
-            setShowConsent(true);
-          } else {
-            performAnalysis();
-          }
-        }, 500);
-      }
+      };
+      reader.readAsDataURL(file);
     }
   };
-
-  // Cleanup camera on unmount
-  useEffect(() => {
-    return () => {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, [stream]);
   const generateSimpleHash = async (file: File): Promise<string> => {
     // Simple hash based on file properties
     return `${file.name}-${file.size}-${file.lastModified}`;
@@ -170,11 +94,11 @@ const Index = () => {
     console.log('Starting analysis...');
     setAnalyzing(true);
     try {
-      // Convert base64 to blob
-      const imageResponse = await fetch(beforeImage);
-      const blob = await imageResponse.blob();
-      const file = new File([blob], `captured-${Date.now()}.jpg`, { type: 'image/jpeg' });
-      
+      const file = beforeInputRef.current?.files?.[0];
+      if (!file) {
+        console.error('No file found in input');
+        throw new Error('ไม่พบไฟล์ภาพ');
+      }
       console.log('Uploading image to storage...', file.name);
       const {
         url: imageUrl,
@@ -254,7 +178,6 @@ const Index = () => {
     setBeforeImage(null);
     setAnalysis(null);
     setUploadedImageUrl('');
-    stopCamera();
   };
   const handleConsentAccept = () => {
     setConsentAccepted(true);
@@ -450,81 +373,29 @@ const Index = () => {
             </div>
             
             <div className="p-4">
-              {!beforeImage && !cameraActive ? (
-                <div className="space-y-4">
-                  <Button
-                    onClick={startCamera}
-                    className="w-full h-24 bg-gradient-to-r from-[#E91E8C] to-[#F06292] hover:opacity-90 text-white text-lg font-semibold rounded-2xl shadow-elegant active:scale-95 transition-all"
-                  >
-                    <Camera className="w-8 h-8 mr-3" />
-                    เปิดกล้องเพื่อถ่ายรูป
-                  </Button>
-                  <p className="text-center text-sm text-gray-600">
-                    ระบบจะสแกนและวิเคราะห์ใบหน้าอัตโนมัติ
-                  </p>
-                </div>
-              ) : cameraActive ? (
-                <div className="space-y-4">
-                  <div className="relative rounded-2xl overflow-hidden border-4 border-[#E91E8C] bg-black">
-                    <video
-                      ref={videoRef}
-                      autoPlay
-                      playsInline
-                      muted
-                      className="w-full h-auto scale-x-[-1]"
-                      style={{ transform: 'scaleX(-1)' }}
-                    />
-                    {/* Face scanning box overlay */}
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className="relative w-64 h-80 border-4 border-[#E91E8C] rounded-3xl shadow-glow">
-                        {/* Corner decorations */}
-                        <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-white rounded-tl-2xl"></div>
-                        <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-white rounded-tr-2xl"></div>
-                        <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-white rounded-bl-2xl"></div>
-                        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-white rounded-br-2xl"></div>
-                        
-                        {/* Scanning animation */}
-                        <div className="absolute inset-0 overflow-hidden rounded-3xl">
-                          <div className="absolute w-full h-1 bg-gradient-to-r from-transparent via-[#E91E8C] to-transparent animate-scan"></div>
-                        </div>
-                        
-                        {/* Text instruction */}
-                        <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
-                          <p className="text-white font-bold text-sm bg-[#E91E8C]/80 px-4 py-2 rounded-full shadow-lg animate-pulse">
-                            กำลังสแกนใบหน้า...
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+              {!beforeImage ? <div className="border-2 border-dashed border-[#E91E8C]/30 rounded-2xl p-8 md:p-12 text-center 
+                           hover:border-[#E91E8C] hover:bg-[#FFF0F5]/50 transition-all cursor-pointer active:scale-95" onClick={() => beforeInputRef.current?.click()}>
+                  <div className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#E91E8C] to-[#F06292] 
+                                flex items-center justify-center">
+                    <Upload className="w-8 h-8 md:w-10 md:h-10 text-white" />
                   </div>
-                  
-                  <Button
-                    onClick={stopCamera}
-                    variant="outline"
-                    className="w-full h-12 border-2 border-gray-300 rounded-xl hover:bg-gray-50"
-                  >
-                    <X className="w-5 h-5 mr-2" />
-                    ยกเลิก
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-3">
+                  <p className="text-[#C2185B] font-semibold mb-2 text-base md:text-lg">
+                    แตะเพื่ออัปโหลดภาพ
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    รองรับไฟล์ JPG, PNG
+                  </p>
+                </div> : <div className="space-y-3">
                   <div className="relative rounded-2xl overflow-hidden border-2 border-[#E91E8C]/30">
                     <img src={beforeImage} alt="Before" className="w-full h-auto" />
                   </div>
-                  <Button
-                    onClick={startCamera}
-                    variant="outline"
-                    className="w-full border-2 border-[#E91E8C]/30 text-[#C2185B] hover:bg-[#FFF0F5] font-semibold"
-                  >
-                    <Camera className="w-4 h-4 mr-2" />
-                    ถ่ายรูปใหม่
+                  <Button variant="outline" onClick={() => beforeInputRef.current?.click()} className="w-full border-2 border-[#E91E8C]/30 text-[#C2185B] hover:bg-[#FFF0F5] font-semibold">
+                    <Upload className="w-4 h-4 mr-2" />
+                    เปลี่ยนภาพ
                   </Button>
-                </div>
-              )}
+                </div>}
               
-              {/* Hidden canvas for capturing */}
-              <canvas ref={canvasRef} className="hidden" />
+              <Input ref={beforeInputRef} type="file" accept="image/*" onChange={handleBeforeImageSelect} className="hidden" />
             </div>
           </Card>
         </div>
