@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import html2canvas from "html2canvas";
 import { ResultImage } from "@/components/ResultImage";
+import { FaceScanner } from "@/components/FaceScanner";
 const Index = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string>('');
@@ -18,6 +19,7 @@ const Index = () => {
   const [showConsent, setShowConsent] = useState(false);
   const [consentAccepted, setConsentAccepted] = useState(false);
   const [generatingImage, setGeneratingImage] = useState(false);
+  const [showFaceScanner, setShowFaceScanner] = useState(false);
   const resultImageRef = useRef<HTMLDivElement>(null);
   const {
     toast
@@ -197,10 +199,47 @@ const Index = () => {
       setAnalyzing(false);
     }
   };
+  const handleFaceCapture = async (imageData: string) => {
+    try {
+      // Convert base64 to File
+      const base64Response = await fetch(imageData);
+      const blob = await base64Response.blob();
+      const file = new File([blob], `face-scan-${Date.now()}.jpg`, { type: 'image/jpeg' });
+      
+      // Optimize the captured image
+      toast({
+        title: "⚙️ กำลังเตรียมรูปภาพ...",
+        description: "กำลัง optimize รูปภาพ"
+      });
+      
+      const optimizedFile = await optimizeImage(file);
+      setUploadedFile(optimizedFile);
+      setUploadedImageUrl(imageData);
+      
+      toast({
+        title: "✅ ถ่ายภาพสำเร็จ",
+        description: "พร้อมทำการวิเคราะห์"
+      });
+      
+      // Auto show consent if not accepted
+      if (!consentAccepted) {
+        setShowConsent(true);
+      }
+    } catch (error) {
+      console.error('Error processing captured image:', error);
+      toast({
+        title: "เกิดข้อผิดพลาด",
+        description: "ไม่สามารถประมวลผลรูปภาพได้",
+        variant: "destructive"
+      });
+    }
+  };
+
   const resetAll = () => {
     setUploadedFile(null);
     setUploadedImageUrl('');
     setAnalysis(null);
+    setShowFaceScanner(false);
   };
   const handleConsentAccept = () => {
     setConsentAccepted(true);
@@ -293,6 +332,14 @@ const Index = () => {
     });
   };
   return <div className="min-h-screen bg-gradient-to-br from-white via-[#FFF0F5] to-[#FFE4F0] water-ripple-bg">
+      {/* Face Scanner */}
+      {showFaceScanner && (
+        <FaceScanner
+          onCapture={handleFaceCapture}
+          onClose={() => setShowFaceScanner(false)}
+        />
+      )}
+
       {/* Consent Dialog */}
       <Dialog open={showConsent} onOpenChange={setShowConsent}>
         <DialogContent className="sm:max-w-[500px] border-2 border-[#E91E8C]/20">
@@ -399,27 +446,55 @@ const Index = () => {
             
             <div className="p-4">
               {!uploadedImageUrl && (
-                <div className="border-2 border-dashed border-[#E91E8C]/30 rounded-2xl p-8 md:p-12 text-center 
-                             hover:border-[#E91E8C] hover:bg-[#FFF0F5]/50 transition-all">
-                  <label htmlFor="file-upload" className="cursor-pointer">
+                <div className="space-y-4">
+                  {/* Face Scan Button */}
+                  <div 
+                    className="border-2 border-dashed border-[#E91E8C]/30 rounded-2xl p-8 md:p-12 text-center 
+                             hover:border-[#E91E8C] hover:bg-[#FFF0F5]/50 transition-all cursor-pointer active:scale-95"
+                    onClick={() => setShowFaceScanner(true)}
+                  >
                     <div className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#E91E8C] to-[#F06292] 
                                   flex items-center justify-center animate-pulse">
-                      <Upload className="w-8 h-8 md:w-10 md:h-10 text-white" />
+                      <Camera className="w-8 h-8 md:w-10 md:h-10 text-white" />
                     </div>
                     <p className="text-[#C2185B] font-semibold mb-2 text-base md:text-lg">
-                      อัพโหลดรูปภาพ
+                      สแกนใบหน้าด้วย AI
                     </p>
                     <p className="text-sm text-gray-600">
-                      คลิกเพื่อเลือกรูปภาพจากเครื่อง
+                      ระบบ AI จะตรวจจับและถ่ายภาพอัตโนมัติ
                     </p>
-                    <input
-                      id="file-upload"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileUpload}
-                      className="hidden"
-                    />
-                  </label>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="flex items-center gap-4">
+                    <div className="flex-1 h-px bg-gray-300"></div>
+                    <span className="text-sm text-gray-500 font-medium">หรือ</span>
+                    <div className="flex-1 h-px bg-gray-300"></div>
+                  </div>
+
+                  {/* Upload Button */}
+                  <div className="border-2 border-dashed border-[#E91E8C]/30 rounded-2xl p-8 md:p-12 text-center 
+                             hover:border-[#E91E8C] hover:bg-[#FFF0F5]/50 transition-all">
+                    <label htmlFor="file-upload" className="cursor-pointer">
+                      <div className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 
+                                    flex items-center justify-center">
+                        <Upload className="w-8 h-8 md:w-10 md:h-10 text-white" />
+                      </div>
+                      <p className="text-[#C2185B] font-semibold mb-2 text-base md:text-lg">
+                        อัพโหลดรูปภาพ
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        คลิกเพื่อเลือกรูปภาพจากเครื่อง
+                      </p>
+                      <input
+                        id="file-upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
                 </div>
               )}
               
