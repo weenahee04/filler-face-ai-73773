@@ -454,7 +454,8 @@ const Index = () => {
                       autoPlay
                       playsInline
                       muted
-                      className="w-full h-auto"
+                      className="w-full h-auto scale-x-[-1]"
+                      style={{ transform: 'scaleX(-1)' }}
                     />
                     {/* Face scanning box overlay */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
