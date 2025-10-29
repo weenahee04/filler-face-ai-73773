@@ -121,37 +121,38 @@ const HowToUse = () => {
     <div className="min-h-screen bg-gradient-to-br from-white via-[#FFF0F5] to-[#FFE4F0] water-ripple-bg">
       {/* Header */}
       <header className="bg-gradient-to-r from-[#E91E8C] to-[#F06292] text-white shadow-lg sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-4 py-2.5">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl md:text-3xl font-bold tracking-wide">
+            <h1 className="text-lg md:text-xl font-bold tracking-wide flex-1">
               วิธีการใช้งาน
             </h1>
             <Button
               onClick={() => navigate("/")}
               variant="ghost"
-              className="text-white hover:bg-white/20"
+              className="text-white hover:bg-white/20 flex-shrink-0"
+              size="sm"
             >
-              <Home className="w-5 h-5" />
+              <Home className="w-4 h-4" />
             </Button>
           </div>
-          <p className="text-sm md:text-base text-white/90 mt-1">
+          <p className="text-xs md:text-sm text-white/90 mt-0.5">
             คู่มือการใช้งานแบบละเอียด
           </p>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
+      <div className="container mx-auto px-4 py-6 max-w-5xl">
         {/* Intro Section */}
-        <Card className="mb-8 border-2 border-[#E91E8C]/20 glass-card shadow-card p-6">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#E91E8C] to-[#F06292] flex items-center justify-center flex-shrink-0">
-              <Info className="w-6 h-6 text-white" />
+        <Card className="mb-6 border-2 border-[#E91E8C]/20 glass-card shadow-card p-4">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#E91E8C] to-[#F06292] flex items-center justify-center flex-shrink-0">
+              <Info className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-[#C2185B] mb-2">
+              <h2 className="text-lg font-bold text-[#C2185B] mb-2">
                 ยินดีต้อนรับสู่ระบบวิเคราะห์ใบหน้าด้วย AI
               </h2>
-              <p className="text-gray-700 leading-relaxed">
+              <p className="text-sm text-gray-700 leading-relaxed">
                 ระบบของเราใช้ AI ล้ำสมัยในการวิเคราะห์ใบหน้าและแนะนำจุดที่เหมาะสมสำหรับการฉีดฟิลเลอร์ 
                 ทำให้คุณได้รับคำแนะนำเบื้องต้นก่อนไปพบแพทย์ผู้เชี่ยวชาญ
               </p>
@@ -160,72 +161,72 @@ const HowToUse = () => {
         </Card>
 
         {/* Benefits Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
           {benefits.map((benefit, index) => (
             <Card
               key={index}
-              className="p-4 text-center border-2 border-[#E91E8C]/20 glass-card hover:shadow-elegant transition-all"
+              className="p-3 text-center border-2 border-[#E91E8C]/20 glass-card hover:shadow-elegant transition-all"
             >
-              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-r from-[#E91E8C] to-[#F06292] flex items-center justify-center">
-                <benefit.icon className="w-6 h-6 text-white" />
+              <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-gradient-to-r from-[#E91E8C] to-[#F06292] flex items-center justify-center">
+                <benefit.icon className="w-5 h-5 text-white" />
               </div>
-              <h3 className="font-bold text-[#C2185B] mb-1">{benefit.title}</h3>
-              <p className="text-sm text-gray-600">{benefit.description}</p>
+              <h3 className="font-bold text-[#C2185B] mb-1 text-sm">{benefit.title}</h3>
+              <p className="text-xs text-gray-600">{benefit.description}</p>
             </Card>
           ))}
         </div>
 
         {/* Steps */}
-        <div className="space-y-8 mb-12">
+        <div className="space-y-6 mb-8">
           {steps.map((step, index) => (
             <Card
               key={index}
               className="border-2 border-[#E91E8C]/20 glass-card shadow-card overflow-hidden"
             >
               {/* Step Header */}
-              <div className={`bg-gradient-to-r ${step.color} px-6 py-4`}>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
-                    <step.icon className="w-6 h-6 text-white" />
+              <div className={`bg-gradient-to-r ${step.color} px-4 py-3`}>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
+                    <step.icon className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1">
-                    <div className="text-white/80 text-sm font-medium mb-1">
+                    <div className="text-white/80 text-xs font-medium mb-0.5">
                       ขั้นตอนที่ {step.number}
                     </div>
-                    <h3 className="text-white font-bold text-xl">{step.title}</h3>
+                    <h3 className="text-white font-bold text-base">{step.title}</h3>
                   </div>
                 </div>
               </div>
 
               {/* Step Content */}
-              <div className="p-6 space-y-4">
-                <p className="text-gray-700 text-lg leading-relaxed">
+              <div className="p-4 space-y-3">
+                <p className="text-gray-700 text-sm leading-relaxed">
                   {step.description}
                 </p>
 
                 {/* Tips */}
-                <div className="bg-gradient-to-r from-[#FFF0F5] to-[#FFE4F0] rounded-xl p-4 border border-[#E91E8C]/20">
-                  <h4 className="font-bold text-[#C2185B] mb-3 flex items-center gap-2">
-                    <ThumbsUp className="w-5 h-5" />
+                <div className="bg-gradient-to-r from-[#FFF0F5] to-[#FFE4F0] rounded-xl p-3 border border-[#E91E8C]/20">
+                  <h4 className="font-bold text-[#C2185B] mb-2 flex items-center gap-2 text-sm">
+                    <ThumbsUp className="w-4 h-4" />
                     เคล็ดลับ
                   </h4>
-                  <ul className="space-y-2">
+                  <ul className="space-y-1.5">
                     {step.tips.map((tip, tipIndex) => (
                       <li key={tipIndex} className="flex items-start gap-2 text-gray-700">
-                        <ArrowRight className="w-4 h-4 text-[#E91E8C] mt-0.5 flex-shrink-0" />
-                        <span className="text-sm">{tip}</span>
+                        <ArrowRight className="w-3.5 h-3.5 text-[#E91E8C] mt-0.5 flex-shrink-0" />
+                        <span className="text-xs leading-relaxed">{tip}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
                 {/* Warning */}
-                <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
-                  <div className="flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div className="bg-amber-50 rounded-xl p-3 border border-amber-200">
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="font-bold text-amber-800 mb-1">ข้อควรระวัง</h4>
-                      <p className="text-sm text-amber-700">{step.warning}</p>
+                      <h4 className="font-bold text-amber-800 mb-0.5 text-xs">ข้อควรระวัง</h4>
+                      <p className="text-xs text-amber-700 leading-relaxed">{step.warning}</p>
                     </div>
                   </div>
                 </div>
@@ -235,31 +236,31 @@ const HowToUse = () => {
         </div>
 
         {/* Important Note */}
-        <Card className="mb-8 border-2 border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50 p-6">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0">
-              <AlertCircle className="w-6 h-6 text-white" />
+        <Card className="mb-6 border-2 border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50 p-4">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0">
+              <AlertCircle className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-amber-900 mb-2">
+              <h3 className="text-base font-bold text-amber-900 mb-2">
                 ข้อควรทราบสำคัญ
               </h3>
-              <ul className="space-y-2 text-amber-800">
+              <ul className="space-y-1.5 text-amber-800">
                 <li className="flex items-start gap-2">
                   <span className="text-amber-600">•</span>
-                  <span>ผลการวิเคราะห์จาก AI เป็นเพียงการประเมินเบื้องต้นเท่านั้น</span>
+                  <span className="text-xs leading-relaxed">ผลการวิเคราะห์จาก AI เป็นเพียงการประเมินเบื้องต้นเท่านั้น</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-amber-600">•</span>
-                  <span>ควรปรึกษาแพทย์ผู้เชี่ยวชาญเพื่อรับคำแนะนำที่เหมาะสมกับคุณโดยตรง</span>
+                  <span className="text-xs leading-relaxed">ควรปรึกษาแพทย์ผู้เชี่ยวชาญเพื่อรับคำแนะนำที่เหมาะสมกับคุณโดยตรง</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-amber-600">•</span>
-                  <span>การทำหัตถการฉีดฟิลเลอร์ต้องทำโดยแพทย์ผู้มีใบอนุญาตเท่านั้น</span>
+                  <span className="text-xs leading-relaxed">การทำหัตถการฉีดฟิลเลอร์ต้องทำโดยแพทย์ผู้มีใบอนุญาตเท่านั้น</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-amber-600">•</span>
-                  <span>ปริมาณและตำแหน่งที่แนะนำอาจแตกต่างไปตามดุลยพินิจของแพทย์</span>
+                  <span className="text-xs leading-relaxed">ปริมาณและตำแหน่งที่แนะนำอาจแตกต่างไปตามดุลยพินิจของแพทย์</span>
                 </li>
               </ul>
             </div>
@@ -267,18 +268,20 @@ const HowToUse = () => {
         </Card>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Button
             onClick={() => navigate("/")}
-            className="bg-gradient-to-r from-[#E91E8C] to-[#F06292] hover:opacity-90 font-semibold h-12 px-8 text-base shadow-soft"
+            size="lg"
+            className="bg-gradient-to-r from-[#E91E8C] to-[#F06292] hover:opacity-90 font-semibold h-12 px-6 shadow-soft"
           >
             <Camera className="w-5 h-5 mr-2" />
             เริ่มวิเคราะห์ใบหน้า
           </Button>
           <Button
             variant="outline"
+            size="lg"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="border-2 border-[#E91E8C]/30 text-[#C2185B] hover:bg-[#FFF0F5] font-semibold h-12 px-8"
+            className="border-2 border-[#E91E8C]/30 text-[#C2185B] hover:bg-[#FFF0F5] font-semibold h-12 px-6"
           >
             กลับด้านบน
           </Button>
@@ -286,12 +289,12 @@ const HowToUse = () => {
       </div>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-r from-[#E91E8C] to-[#F06292] text-white py-6 mt-12">
+      <footer className="bg-gradient-to-r from-[#E91E8C] to-[#F06292] text-white py-4 mt-8">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-sm">
+          <p className="text-xs">
             © 2024 Singderm AI Face Analysis. All rights reserved.
           </p>
-          <p className="text-xs text-white/80 mt-2">
+          <p className="text-[10px] text-white/80 mt-1">
             ผลการวิเคราะห์เป็นเพียงการประเมินเบื้องต้น ควรปรึกษาแพทย์ผู้เชี่ยวชาญ
           </p>
         </div>
