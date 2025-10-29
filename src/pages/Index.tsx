@@ -390,18 +390,18 @@ const Index = () => {
 
       {/* Header */}
       <header className="bg-gradient-to-r from-[#E91E8C] to-[#F06292] text-white shadow-lg sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-4 py-2.5">
           <div className="flex items-center justify-between">
             <div className="flex-1 text-center">
-              <h1 className="text-2xl md:text-3xl font-bold tracking-wide">
+              <h1 className="text-lg md:text-xl font-bold tracking-wide">
                 วิเคราะห์ใบหน้าด้วย AI
               </h1>
-              <p className="text-sm md:text-base text-white/90 mt-1">
+              <p className="text-xs md:text-sm text-white/90 mt-0.5">
                 AI วิเคราะห์ใบหน้าและแนะนำฟิลเลอร์
               </p>
             </div>
             <Button onClick={() => navigate("/how-to-use")} variant="ghost" className="text-white hover:bg-white/20 flex-shrink-0" title="วิธีการใช้งาน">
-              <Info className="w-5 h-5" />
+              <Info className="w-4 h-4" />
             </Button>
           </div>
         </div>
