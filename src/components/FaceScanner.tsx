@@ -202,186 +202,170 @@ export const FaceScanner = ({ onCapture, onClose }: FaceScannerProps) => {
 
   return (
     <div className="fixed inset-0 bg-black z-50 flex flex-col">
-      {/* Header with Back Button */}
-      <div className="bg-gradient-to-r from-[#E91E8C] to-[#F06292] px-4 py-3">
-        <div className="flex items-center justify-between">
+      {/* Compact Header */}
+      <div className="bg-gradient-to-r from-[#E91E8C] to-[#F06292] px-3 py-2.5 flex-shrink-0">
+        <div className="flex items-center justify-between max-w-screen-xl mx-auto">
           <Button
             onClick={handleClose}
             variant="ghost"
             size="sm"
-            className="text-white hover:bg-white/20 font-semibold"
+            className="text-white hover:bg-white/20 font-semibold h-9 px-3"
           >
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            ย้อนกลับ
+            <ArrowLeft className="w-4 h-4 mr-1.5" />
+            <span className="text-sm">ย้อนกลับ</span>
           </Button>
-          <h2 className="text-white font-bold text-lg">สแกนใบหน้าด้วย AI</h2>
+          <h2 className="text-white font-bold text-base">สแกนใบหน้า</h2>
           <Button
             onClick={() => setShowInstructions(!showInstructions)}
             variant="ghost"
             size="sm"
-            className="text-white hover:bg-white/20"
+            className="text-white hover:bg-white/20 h-9 w-9 p-0"
             title="คำแนะนำ"
           >
-            <Info className="w-5 h-5" />
+            <Info className="w-4 h-4" />
           </Button>
         </div>
       </div>
 
-      {/* Instructions Panel */}
+      {/* Compact Instructions */}
       {showInstructions && !isLoading && (
-        <div className="bg-gradient-to-br from-purple-900/95 to-pink-900/95 backdrop-blur-sm px-4 py-4 border-b-2 border-white/20">
-          <div className="max-w-2xl mx-auto">
-            <h3 className="text-white font-bold text-base mb-3 flex items-center gap-2">
-              <Info className="w-5 h-5" />
-              คำแนะนำในการสแกนใบหน้า
-            </h3>
-            <div className="grid md:grid-cols-2 gap-3 text-sm text-white/90">
-              <div className="flex items-start gap-2">
-                <span className="text-green-400 font-bold">✓</span>
-                <span>วางใบหน้าให้อยู่ตรงกลางกรอบ</span>
+        <div className="bg-gradient-to-br from-purple-900/95 to-pink-900/95 px-3 py-3 border-b border-white/10 flex-shrink-0">
+          <div className="max-w-screen-xl mx-auto">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-white font-bold text-sm flex items-center gap-1.5">
+                <Info className="w-3.5 h-3.5" />
+                คำแนะนำ
+              </h3>
+              <Button
+                onClick={() => setShowInstructions(false)}
+                variant="ghost"
+                size="sm"
+                className="text-white/80 hover:text-white h-6 text-xs px-2"
+              >
+                ซ่อน
+              </Button>
+            </div>
+            <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs text-white/90">
+              <div className="flex items-center gap-1.5">
+                <span className="text-green-400 text-[10px]">✓</span>
+                <span>วางหน้าตรงกลาง</span>
               </div>
-              <div className="flex items-start gap-2">
-                <span className="text-green-400 font-bold">✓</span>
-                <span>อยู่ในที่ที่มีแสงสว่างเพียงพอ</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-green-400 text-[10px]">✓</span>
+                <span>แสงสว่างเพียงพอ</span>
               </div>
-              <div className="flex items-start gap-2">
-                <span className="text-green-400 font-bold">✓</span>
-                <span>มองตรงเข้ากล้องโดยตรง</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-green-400 text-[10px]">✓</span>
+                <span>มองตรงกล้อง</span>
               </div>
-              <div className="flex items-start gap-2">
-                <span className="text-green-400 font-bold">✓</span>
-                <span>ถอดแว่นตาและหมวก (ถ้ามี)</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <span className="text-green-400 font-bold">✓</span>
-                <span>ยิ้มเบาๆ หรือหน้าเป็นกลาง</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <span className="text-green-400 font-bold">✓</span>
-                <span>รอให้ระบบตรวจจับอัตโนมัติ</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-green-400 text-[10px]">✓</span>
+                <span>ถอดแว่นและหมวก</span>
               </div>
             </div>
-            <Button
-              onClick={() => setShowInstructions(false)}
-              size="sm"
-              className="mt-3 w-full bg-white/20 hover:bg-white/30 text-white border border-white/30"
-            >
-              เข้าใจแล้ว เริ่มสแกน
-            </Button>
           </div>
         </div>
       )}
 
-      {/* Camera View */}
-      <div className="flex-1 relative flex items-center justify-center bg-black">
+      {/* Camera View - ใช้พื้นที่ส่วนที่เหลือทั้งหมด */}
+      <div className="flex-1 relative bg-black overflow-hidden">
         {isLoading ? (
-          <div className="flex flex-col items-center gap-4">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
             <div className="relative">
-              <Loader2 className="w-16 h-16 text-[#E91E8C] animate-spin" />
+              <Loader2 className="w-12 h-12 text-[#E91E8C] animate-spin" />
               <div className="absolute inset-0 rounded-full bg-[#E91E8C] opacity-20 animate-ping" />
             </div>
-            <div className="text-center">
-              <p className="text-white font-bold text-lg mb-1">กำลังเตรียมกล้อง</p>
-              <p className="text-white/70 text-sm">กรุณารอสักครู่...</p>
+            <div className="text-center px-4">
+              <p className="text-white font-bold text-base mb-0.5">กำลังเตรียมกล้อง</p>
+              <p className="text-white/60 text-xs">กรุณารอสักครู่...</p>
             </div>
           </div>
         ) : (
           <>
-            {/* Video */}
+            {/* Video - เต็มพื้นที่ */}
             <video
               ref={videoRef}
               autoPlay
               playsInline
-              className="max-w-full max-h-full scale-x-[-1]"
+              className="absolute inset-0 w-full h-full object-cover scale-x-[-1]"
               style={{ transform: "scaleX(-1)" }}
             />
 
-            {/* Canvas overlay for detection */}
+            {/* Canvas overlay */}
             <canvas
               ref={canvasRef}
-              className="absolute inset-0 max-w-full max-h-full scale-x-[-1] mx-auto"
+              className="absolute inset-0 w-full h-full scale-x-[-1]"
               style={{ transform: "scaleX(-1)" }}
             />
 
-            {/* Face detection guide overlay */}
-            <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-              {/* Main oval guide */}
+            {/* Face guide - ปรับขนาดตามหน้าจอ */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              {/* Main oval - responsive size */}
               <div 
-                className="w-64 h-80 border-4 rounded-full transition-all duration-300"
+                className="border-[3px] rounded-full transition-all duration-300"
                 style={{ 
+                  width: 'min(240px, 70vw)',
+                  height: 'min(300px, 50vh)',
                   borderColor: faceDetected ? "#00FF00" : "#E91E8C",
                   boxShadow: faceDetected 
-                    ? "0 0 40px rgba(0, 255, 0, 0.5), inset 0 0 40px rgba(0, 255, 0, 0.2)" 
-                    : "0 0 40px rgba(233, 30, 140, 0.5), inset 0 0 40px rgba(233, 30, 140, 0.2)"
+                    ? "0 0 30px rgba(0, 255, 0, 0.4)" 
+                    : "0 0 30px rgba(233, 30, 140, 0.4)"
                 }}
               />
-              
-              {/* Corner guides */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-88">
-                {/* Top left */}
-                <div className="absolute top-0 left-0 w-8 h-8 border-l-4 border-t-4 border-white/60 rounded-tl-2xl" />
-                {/* Top right */}
-                <div className="absolute top-0 right-0 w-8 h-8 border-r-4 border-t-4 border-white/60 rounded-tr-2xl" />
-                {/* Bottom left */}
-                <div className="absolute bottom-0 left-0 w-8 h-8 border-l-4 border-b-4 border-white/60 rounded-bl-2xl" />
-                {/* Bottom right */}
-                <div className="absolute bottom-0 right-0 w-8 h-8 border-r-4 border-b-4 border-white/60 rounded-br-2xl" />
-              </div>
             </div>
 
-            {/* Status indicator */}
-            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10">
-              <div className={`px-6 py-3 rounded-full backdrop-blur-md border-2 transition-all duration-300 ${
+            {/* Status - ติดด้านบน */}
+            <div className="absolute top-3 left-0 right-0 flex justify-center px-3 z-10">
+              <div className={`px-4 py-2 rounded-full backdrop-blur-md border transition-all duration-300 ${
                 faceDetected 
-                  ? "bg-green-500/90 border-green-300" 
+                  ? "bg-green-500/90 border-green-400" 
                   : "bg-black/70 border-white/30"
               }`}>
-                <p className={`text-sm font-bold flex items-center gap-2 ${
-                  faceDetected ? "text-white" : "text-white/90"
-                }`}>
+                <p className="text-xs font-bold text-white flex items-center gap-1.5">
                   {faceDetected ? (
                     <>
-                      <span className="w-3 h-3 bg-white rounded-full animate-pulse" />
-                      <Camera className="w-4 h-4" />
-                      ตรวจพบใบหน้า - กำลังถ่ายภาพ...
+                      <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                      <Camera className="w-3.5 h-3.5" />
+                      <span>พบใบหน้า - กำลังถ่าย...</span>
                     </>
                   ) : (
                     <>
-                      <span className="w-3 h-3 bg-[#E91E8C] rounded-full animate-pulse" />
-                      วางใบหน้าให้อยู่ในกรอบ
+                      <span className="w-2 h-2 bg-[#E91E8C] rounded-full animate-pulse" />
+                      <span>วางใบหน้าในกรอบ</span>
                     </>
                   )}
                 </p>
               </div>
             </div>
 
-            {/* Tips at bottom */}
-            <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-10 max-w-md px-4">
-              <div className="bg-black/80 backdrop-blur-md border-2 border-white/20 rounded-2xl px-6 py-4">
-                <p className="text-white text-sm text-center leading-relaxed">
-                  💡 <span className="font-semibold">เคล็ดลับ:</span> หากระบบไม่ตรวจพบใบหน้า<br/>
-                  ให้ลองขยับเข้าใกล้กล้อง หรือเพิ่มแสงสว่าง
-                </p>
+            {/* Tips - ติดด้านล่าง ไม่ทับปุ่ม */}
+            {!faceDetected && (
+              <div className="absolute bottom-24 left-0 right-0 px-4 z-10">
+                <div className="bg-black/80 backdrop-blur-sm border border-white/20 rounded-xl px-3 py-2 max-w-sm mx-auto">
+                  <p className="text-white/90 text-[11px] text-center leading-relaxed">
+                    💡 <span className="font-semibold">เคล็ดลับ:</span> หากไม่พบใบหน้า ให้ขยับเข้าใกล้กล้อง
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
           </>
         )}
       </div>
 
-      {/* Manual capture button */}
+      {/* Bottom Button Bar - ติดด้านล่างเสมอ */}
       {!isLoading && (
-        <div className="bg-gradient-to-t from-black via-black/95 to-transparent px-4 py-6">
-          <div className="max-w-md mx-auto space-y-3">
+        <div className="bg-gradient-to-t from-black via-black/98 to-black/90 px-4 py-4 flex-shrink-0 border-t border-white/5">
+          <div className="max-w-sm mx-auto space-y-2">
             <Button
               onClick={capturePhoto}
               size="lg"
-              className="w-full bg-gradient-to-r from-[#E91E8C] to-[#F06292] hover:opacity-90 font-bold text-lg h-14 shadow-2xl"
+              className="w-full bg-gradient-to-r from-[#E91E8C] to-[#F06292] hover:opacity-90 font-bold text-base h-12 shadow-xl"
             >
-              <Camera className="w-6 h-6 mr-2" />
+              <Camera className="w-5 h-5 mr-2" />
               ถ่ายภาพด้วยตัวเอง
             </Button>
-            <p className="text-white/60 text-xs text-center">
-              หรือรอให้ระบบถ่ายภาพอัตโนมัติเมื่อตรวจพบใบหน้า
+            <p className="text-white/50 text-[10px] text-center leading-tight">
+              หรือรอให้ระบบถ่ายอัตโนมัติ
             </p>
           </div>
         </div>
