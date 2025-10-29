@@ -35,6 +35,24 @@ serve(async (req) => {
 
     console.log('Starting face analysis with AI...');
 
+    // Download image from storage and convert to base64
+    console.log('Downloading image from storage...');
+    let imageBase64: string;
+    try {
+      const imageResponse = await fetch(imageUrl);
+      if (!imageResponse.ok) {
+        throw new Error(`Failed to download image: ${imageResponse.status}`);
+      }
+      
+      const imageBuffer = await imageResponse.arrayBuffer();
+      const base64 = btoa(String.fromCharCode(...new Uint8Array(imageBuffer)));
+      imageBase64 = `data:image/jpeg;base64,${base64}`;
+      console.log('Image converted to base64, length:', imageBase64.length);
+    } catch (downloadError) {
+      console.error('Error downloading image:', downloadError);
+      throw new Error('ไม่สามารถดาวน์โหลดรูปภาพได้ กรุณาลองใหม่อีกครั้ง');
+    }
+
     // Analyze face using Gemini Vision model
     console.log('Calling AI gateway...');
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -145,7 +163,7 @@ Rules:
               {
                 type: 'image_url',
                 image_url: {
-                  url: imageUrl
+                  url: imageBase64
                 }
               }
             ]
