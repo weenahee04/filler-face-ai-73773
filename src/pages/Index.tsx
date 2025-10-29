@@ -427,163 +427,192 @@ const Index = () => {
               </div>
               <div>
                 <h3 className="text-white font-bold text-base">วิธีการใช้งาน</h3>
-                <p className="text-white/90 text-xs">ดูคู่มือการใช้งานแบบละเอียด</p>
+                <p className="text-white/90 text-xs">คู่มือใช้งานแบบละเอียด</p>
               </div>
             </div>
             <ArrowRight className="w-5 h-5 text-white" />
           </div>
         </Card>
 
-        <div className="mb-6">
-          {/* Camera View */}
-          <Card className="border-2 border-[#E91E8C]/20 glass-card shadow-card overflow-hidden">
+        {/* Feature Selection (only show when no image uploaded) */}
+        {!uploadedImageUrl && !analysis && (
+          <div className="mb-6 p-6 bg-white/80 backdrop-blur-sm rounded-2xl border-2 border-[#E91E8C]/20 shadow-card">
+            <div className="text-center mb-4">
+              <h3 className="text-xl font-bold text-[#C2185B] mb-2">เริ่มต้นวิเคราะห์ใบหน้า</h3>
+              <p className="text-sm text-gray-600">เลือกวิธีการที่คุณต้องการ</p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-4">
+              {/* Face Scan Option */}
+              <div 
+                className="group border-2 border-[#E91E8C]/30 rounded-2xl p-6 text-center 
+                         hover:border-[#E91E8C] hover:bg-[#FFF0F5]/50 transition-all cursor-pointer 
+                         hover:scale-105 active:scale-95"
+                onClick={() => setShowFaceScanner(true)}
+              >
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#E91E8C] to-[#F06292] 
+                              flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Camera className="w-8 h-8 text-white" />
+                </div>
+                <h4 className="text-[#C2185B] font-bold text-lg mb-2">
+                  สแกนใบหน้าด้วย AI
+                </h4>
+                <p className="text-sm text-gray-600 mb-3">
+                  AI ตรวจจับและถ่ายภาพอัตโนมัติ
+                </p>
+                <div className="flex flex-col gap-1 text-xs text-gray-500">
+                  <span>✓ ตรวจจับใบหน้า Real-time</span>
+                  <span>✓ ถ่ายภาพอัตโนมัติ</span>
+                  <span>✓ ได้ภาพคุณภาพสูง</span>
+                </div>
+              </div>
+
+              {/* Upload Option */}
+              <label htmlFor="file-upload-choice" className="cursor-pointer">
+                <div className="group border-2 border-purple-300 rounded-2xl p-6 text-center 
+                             hover:border-purple-500 hover:bg-purple-50 transition-all 
+                             hover:scale-105 active:scale-95 h-full">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 
+                                flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Upload className="w-8 h-8 text-white" />
+                  </div>
+                  <h4 className="text-purple-700 font-bold text-lg mb-2">
+                    อัพโหลดรูปภาพ
+                  </h4>
+                  <p className="text-sm text-gray-600 mb-3">
+                    เลือกรูปจากแกลเลอรี
+                  </p>
+                  <div className="flex flex-col gap-1 text-xs text-gray-500">
+                    <span>✓ ใช้รูปที่มีอยู่แล้ว</span>
+                    <span>✓ รองรับทุกรูปแบบ</span>
+                    <span>✓ เลือกรูปที่ชอบ</span>
+                  </div>
+                </div>
+                <input
+                  id="file-upload-choice"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+              </label>
+            </div>
+          </div>
+        )}
+
+        {/* Image Preview & Analysis Section (only show when image is uploaded) */}
+        {uploadedImageUrl && (
+          <Card className="mb-6 border-2 border-[#E91E8C]/20 glass-card shadow-card overflow-hidden">
             <div className="bg-gradient-to-r from-[#E91E8C] to-[#F06292] px-4 py-3">
               <h2 className="text-white font-bold text-lg flex items-center gap-2">
-                <Upload className="w-5 h-5" />
-                อัพโหลดรูปใบหน้า
+                <Sparkles className="w-5 h-5" />
+                รูปภาพของคุณ
               </h2>
             </div>
             
             <div className="p-4">
-              {!uploadedImageUrl && (
-                <div className="space-y-4">
-                  {/* Face Scan Button */}
-                  <div 
-                    className="border-2 border-dashed border-[#E91E8C]/30 rounded-2xl p-8 md:p-12 text-center 
-                             hover:border-[#E91E8C] hover:bg-[#FFF0F5]/50 transition-all cursor-pointer active:scale-95"
-                    onClick={() => setShowFaceScanner(true)}
-                  >
-                    <div className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#E91E8C] to-[#F06292] 
-                                  flex items-center justify-center animate-pulse">
-                      <Camera className="w-8 h-8 md:w-10 md:h-10 text-white" />
+              <div className="space-y-4">
+                {/* Image Preview */}
+                <div className="relative rounded-2xl overflow-hidden border-2 border-[#E91E8C]/30 group">
+                  <img src={uploadedImageUrl} alt="Uploaded Face" className="w-full h-auto" />
+                  {!analysis && (
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4">
+                      <p className="text-white text-sm font-medium">รูปภาพพร้อมวิเคราะห์</p>
                     </div>
-                    <p className="text-[#C2185B] font-semibold mb-2 text-base md:text-lg">
-                      สแกนใบหน้าด้วย AI
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      ระบบ AI จะตรวจจับและถ่ายภาพอัตโนมัติ
-                    </p>
-                  </div>
-
-                  {/* Divider */}
-                  <div className="flex items-center gap-4">
-                    <div className="flex-1 h-px bg-gray-300"></div>
-                    <span className="text-sm text-gray-500 font-medium">หรือ</span>
-                    <div className="flex-1 h-px bg-gray-300"></div>
-                  </div>
-
-                  {/* Upload Button */}
-                  <div className="border-2 border-dashed border-[#E91E8C]/30 rounded-2xl p-8 md:p-12 text-center 
-                             hover:border-[#E91E8C] hover:bg-[#FFF0F5]/50 transition-all">
-                    <label htmlFor="file-upload" className="cursor-pointer">
-                      <div className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 
-                                    flex items-center justify-center">
-                        <Upload className="w-8 h-8 md:w-10 md:h-10 text-white" />
-                      </div>
-                      <p className="text-[#C2185B] font-semibold mb-2 text-base md:text-lg">
-                        อัพโหลดรูปภาพ
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        คลิกเพื่อเลือกรูปภาพจากเครื่อง
-                      </p>
-                      <input
-                        id="file-upload"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileUpload}
-                        className="hidden"
-                      />
-                    </label>
-                  </div>
+                  )}
                 </div>
-              )}
-              
-              {uploadedImageUrl && !analysis && (
-                <div className="space-y-3">
-                  <div className="relative rounded-2xl overflow-hidden border-2 border-[#E91E8C]/30">
-                    <img src={uploadedImageUrl} alt="Uploaded Face" className="w-full h-auto" />
-                  </div>
-                  <div className="flex gap-2">
+
+                {/* Action Buttons */}
+                {!analysis && (
+                  <div className="grid grid-cols-2 gap-3">
                     <Button 
                       onClick={performAnalysis}
                       disabled={analyzing}
-                      className="flex-1 bg-gradient-to-r from-[#E91E8C] to-[#F06292] hover:opacity-90 font-semibold h-12"
+                      size="lg"
+                      className="bg-gradient-to-r from-[#E91E8C] to-[#F06292] hover:opacity-90 font-semibold"
                     >
                       {analyzing ? (
                         <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          กำลังวิเคราะห์...
+                          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                          วิเคราะห์...
                         </>
                       ) : (
-                        "วิเคราะห์ใบหน้า"
+                        <>
+                          <Sparkles className="w-5 h-5 mr-2" />
+                          วิเคราะห์ใบหน้า
+                        </>
                       )}
                     </Button>
-                    <label htmlFor="file-upload-new" className="flex-1">
-                      <Button 
-                        variant="outline"
-                        className="w-full border-2 border-[#E91E8C]/30 text-[#C2185B] hover:bg-[#FFF0F5] font-semibold h-12"
-                        type="button"
-                        asChild
-                      >
-                        <div>
-                          <Upload className="w-4 h-4 mr-2" />
-                          อัพโหลดใหม่
-                        </div>
-                      </Button>
-                      <input
-                        id="file-upload-new"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileUpload}
-                        className="hidden"
-                      />
-                    </label>
+                    
+                    <Button 
+                      onClick={resetAll}
+                      variant="outline"
+                      size="lg"
+                      className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold"
+                    >
+                      เริ่มใหม่
+                    </Button>
                   </div>
-                </div>
-              )}
-            </div>
-          </Card>
-        </div>
-
-        {/* Analyzing Status */}
-        {uploadedImageUrl && analyzing && (
-          <Card className="border-2 border-[#E91E8C]/20 glass-card shadow-card p-6 mb-6">
-            <div className="flex items-center justify-center gap-3">
-              <Loader2 className="w-6 h-6 text-[#E91E8C] animate-spin" />
-              <span className="text-[#C2185B] font-semibold">กำลังวิเคราะห์ด้วย AI...</span>
+                )}
+              </div>
             </div>
           </Card>
         )}
 
-        {/* Action Buttons */}
+        {/* Analyzing Status */}
+        {analyzing && (
+          <Card className="border-2 border-[#E91E8C]/20 glass-card shadow-card overflow-hidden mb-6">
+            <div className="bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-3">
+              <h2 className="text-white font-bold text-lg flex items-center gap-2">
+                <Loader2 className="w-5 h-5 animate-spin" />
+                กำลังประมวลผล
+              </h2>
+            </div>
+            <div className="p-6">
+              <div className="flex flex-col items-center gap-4">
+                <div className="relative">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#E91E8C] to-[#F06292] flex items-center justify-center">
+                    <Loader2 className="w-10 h-10 text-white animate-spin" />
+                  </div>
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#E91E8C] to-[#F06292] opacity-20 animate-ping" />
+                </div>
+                <div className="text-center">
+                  <p className="text-[#C2185B] font-bold text-lg mb-1">AI กำลังวิเคราะห์ใบหน้า</p>
+                  <p className="text-gray-600 text-sm">กรุณารอสักครู่...</p>
+                </div>
+                <div className="w-full max-w-xs bg-gray-200 rounded-full h-2 overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-[#E91E8C] to-[#F06292] animate-pulse" style={{ width: '70%' }} />
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {/* Reset Button (show after analysis) */}
         {analysis && (
           <div className="flex justify-center mb-6">
-            <Button onClick={resetAll} variant="outline" className="border-2 border-gray-300 text-gray-600 hover:bg-gray-50 font-semibold h-12">
-              เริ่มใหม่
+            <Button 
+              onClick={resetAll} 
+              size="lg"
+              className="bg-gradient-to-r from-gray-600 to-gray-700 hover:opacity-90 text-white font-semibold shadow-lg"
+            >
+              <Upload className="w-5 h-5 mr-2" />
+              วิเคราะห์รูปใหม่
             </Button>
           </div>
         )}
 
         {/* Analysis Results */}
-        {(analyzing || analysis) && <Card className="border-2 border-[#E91E8C]/20 glass-card shadow-card overflow-hidden">
-            <div className="bg-gradient-to-r from-[#E91E8C] to-[#F06292] px-4 py-3">
+        {analysis && <Card className="border-2 border-[#E91E8C]/20 glass-card shadow-card overflow-hidden">
+            <div className="bg-gradient-to-r from-[#E91E8C] via-[#F06292] to-[#E91E8C] px-4 py-3">
               <h2 className="text-white font-bold text-lg flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5" />
-                ผลการวิเคราะห์
+                ผลการวิเคราะห์ใบหน้า
               </h2>
             </div>
 
             <div className="p-4">
-              {analyzing ? <div className="flex flex-col items-center justify-center py-12">
-                  <div className="relative mb-6">
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#E91E8C] to-[#F06292] flex items-center justify-center">
-                      <Loader2 className="w-10 h-10 text-white animate-spin" />
-                    </div>
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#E91E8C] to-[#F06292] opacity-20 animate-ping" />
-                  </div>
-                  <p className="text-[#C2185B] font-semibold text-lg">กำลังวิเคราะห์ด้วย AI...</p>
-                  <p className="text-gray-600 text-sm mt-2">โปรดรอสักครู่</p>
-                </div> : analysis ? <div className="space-y-4">
+              {analysis && <div className="space-y-4">
                   {/* Error State */}
                   {analysis.parseError && <div className="p-4 bg-yellow-50 border-2 border-yellow-300 rounded-xl">
                       <p className="text-yellow-800 font-semibold">⚠️ ระบบไม่สามารถประมวลผลได้สมบูรณ์</p>
@@ -727,7 +756,7 @@ const Index = () => {
                       💡 <strong>วิธีแชร์ใน Instagram Story:</strong> กดดาวน์โหลดรูป → เปิด Instagram → เพิ่ม Story → เลือกรูปที่ดาวน์โหลด
                     </p>
                   </div>
-                </div> : null}
+                </div>}
             </div>
           </Card>}
 
