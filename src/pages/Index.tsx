@@ -23,22 +23,103 @@ const Index = () => {
     toast
   } = useToast();
   const navigate = useNavigate();
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const optimizeImage = async (file: File): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          // Calculate new dimensions (max width 800px)
+          const MAX_WIDTH = 800;
+          let width = img.width;
+          let height = img.height;
+          
+          if (width > MAX_WIDTH) {
+            height = (height * MAX_WIDTH) / width;
+            width = MAX_WIDTH;
+          }
+          
+          // Create canvas and resize
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Cannot get canvas context'));
+            return;
+          }
+          
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Convert to blob with compression
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) {
+                reject(new Error('Failed to compress image'));
+                return;
+              }
+              
+              // Create optimized file
+              const optimizedFile = new File([blob], file.name, {
+                type: 'image/jpeg',
+                lastModified: Date.now(),
+              });
+              
+              console.log('Image optimization:');
+              console.log('Original size:', (file.size / 1024).toFixed(2), 'KB');
+              console.log('Optimized size:', (optimizedFile.size / 1024).toFixed(2), 'KB');
+              console.log('Reduction:', ((1 - optimizedFile.size / file.size) * 100).toFixed(1), '%');
+              
+              resolve(optimizedFile);
+            },
+            'image/jpeg',
+            0.85 // Quality 85%
+          );
+        };
+        
+        img.onerror = () => reject(new Error('Failed to load image'));
+        img.src = e.target?.result as string;
+      };
+      
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      setUploadedFile(file);
-      const imageUrl = URL.createObjectURL(file);
+    if (!file) return;
+    
+    try {
+      toast({
+        title: "⚙️ กำลังเตรียมรูปภาพ...",
+        description: "กำลัง optimize รูปภาพ"
+      });
+      
+      // Optimize image before upload
+      const optimizedFile = await optimizeImage(file);
+      setUploadedFile(optimizedFile);
+      
+      const imageUrl = URL.createObjectURL(optimizedFile);
       setUploadedImageUrl(imageUrl);
       
       toast({
         title: "✅ อัพโหลดสำเร็จ",
-        description: "พร้อมทำการวิเคราะห์"
+        description: "รูปภาพถูก optimize แล้ว พร้อมทำการวิเคราะห์"
       });
 
       // Auto show consent if not accepted
       if (!consentAccepted) {
         setShowConsent(true);
       }
+    } catch (error) {
+      console.error('Error optimizing image:', error);
+      toast({
+        title: "เกิดข้อผิดพลาด",
+        description: "ไม่สามารถประมวลผลรูปภาพได้",
+        variant: "destructive"
+      });
     }
   };
   
