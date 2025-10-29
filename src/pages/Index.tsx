@@ -11,14 +11,10 @@ import { Label } from "@/components/ui/label";
 import html2canvas from "html2canvas";
 import { ResultImage } from "@/components/ResultImage";
 const Index = () => {
-  const [beforeImage, setBeforeImage] = useState<string | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>('');
   const [analyzing, setAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<any>(null);
-  const [showCamera, setShowCamera] = useState(false);
-  const [stream, setStream] = useState<MediaStream | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>('');
-  const [uploadedImageHash, setUploadedImageHash] = useState<string>('');
   const [showConsent, setShowConsent] = useState(false);
   const [consentAccepted, setConsentAccepted] = useState(false);
   const [generatingImage, setGeneratingImage] = useState(false);
@@ -27,197 +23,89 @@ const Index = () => {
     toast
   } = useToast();
   const navigate = useNavigate();
-  const startCamera = async () => {
-    try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user" }
-      });
-      setStream(mediaStream);
-      setShowCamera(true);
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setUploadedFile(file);
+      const imageUrl = URL.createObjectURL(file);
+      setUploadedImageUrl(imageUrl);
       
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
+      toast({
+        title: "✅ อัพโหลดสำเร็จ",
+        description: "พร้อมทำการวิเคราะห์"
+      });
+
+      // Auto show consent if not accepted
+      if (!consentAccepted) {
+        setShowConsent(true);
       }
-      
-      toast({
-        title: "📸 เปิดกล้องสำเร็จ",
-        description: "วางใบหน้าให้อยู่ในกรอบ",
-      });
-      
-      // Auto scan after 3 seconds
-      setTimeout(() => {
-        capturePhoto();
-      }, 3000);
-    } catch (error) {
-      console.error("Error accessing camera:", error);
-      toast({
-        title: "ไม่สามารถเปิดกล้องได้",
-        description: "กรุณาอนุญาตให้เข้าถึงกล้องในการตั้งค่าเบราว์เซอร์",
-        variant: "destructive"
-      });
     }
-  };
-
-  const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-      setStream(null);
-    }
-    setShowCamera(false);
-  };
-
-  const capturePhoto = () => {
-    if (!videoRef.current) return;
-    
-    const video = videoRef.current;
-    const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    
-    const ctx = canvas.getContext("2d");
-    if (ctx) {
-      // Mirror the image
-      ctx.scale(-1, 1);
-      ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
-      
-      const imageData = canvas.toDataURL("image/jpeg");
-      setBeforeImage(imageData);
-      stopCamera();
-      
-      toast({
-        title: "✅ สแกนใบหน้าสำเร็จ",
-        description: "กำลังเริ่มวิเคราะห์ด้วย AI...",
-      });
-      
-      // Auto start analysis after short delay
-      setTimeout(() => {
-        if (consentAccepted) {
-          performAnalysisFromCamera(imageData);
-        } else {
-          setShowConsent(true);
-        }
-      }, 500);
-    }
-  };
-  const dataURLtoFile = (dataurl: string, filename: string): File => {
-    const arr = dataurl.split(',');
-    const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new File([u8arr], filename, { type: mime });
-  };
-
-  const generateSimpleHash = async (file: File): Promise<string> => {
-    // Simple hash based on file properties
-    return `${file.name}-${file.size}-${file.lastModified}`;
   };
   
-  const uploadImageToStorage = async (file: File): Promise<{
-    url: string;
-    hash: string;
-  }> => {
-    // Generate simple hash for duplicate detection
-    const imageHash = await generateSimpleHash(file);
-    console.log('Image hash:', imageHash);
-
-    // TODO: Check if this image was analyzed before
-    // Currently disabled due to missing face_analyses table
-    /*
-    const { data: existingAnalysis } = await supabase
-      .from('face_analyses')
-      .select('*')
-      .eq('image_hash', imageHash)
-      .maybeSingle();
-    
-    if (existingAnalysis) {
-      console.log('Found existing analysis for this image:', existingAnalysis);
-      // Return existing data
-      setAnalysis(existingAnalysis.analysis_result);
-      setUploadedImageUrl(existingAnalysis.image_url);
+  const performAnalysis = async () => {
+    if (!uploadedFile) {
       toast({
-        title: "พบผลการวิเคราะห์เดิม",
-        description: "รูปภาพนี้เคยวิเคราะห์แล้ว กำลังแสดงผลเดิม",
+        title: "กรุณาอัพโหลดรูปภาพก่อน",
+        variant: "destructive"
       });
-      throw new Error('EXISTING_ANALYSIS'); // Special error to stop analysis
+      return;
     }
-    */
 
-    const fileName = `${Date.now()}-${file.name}`;
-    const {
-      data,
-      error
-    } = await supabase.storage.from('face-images').upload(fileName, file);
-    if (error) throw error;
-    const {
-      data: {
-        publicUrl
-      }
-    } = supabase.storage.from('face-images').getPublicUrl(fileName);
-    return {
-      url: publicUrl,
-      hash: imageHash
-    };
-  };
-  const performAnalysisFromCamera = async (imageData: string) => {
-    console.log('Starting analysis from camera...');
+    console.log('Starting analysis from uploaded file...');
     setAnalyzing(true);
+    
     try {
-      // Convert base64 to File
-      const file = dataURLtoFile(imageData, `face-scan-${Date.now()}.jpg`);
-      console.log('Uploading image to storage...', file.name);
-      const {
-        url: imageUrl,
-        hash: imageHash
-      } = await uploadImageToStorage(file);
-      console.log('Image uploaded successfully:', imageUrl);
-      setUploadedImageUrl(imageUrl);
-      setUploadedImageHash(imageHash);
+      console.log('Uploading image to storage...', uploadedFile.name);
+      const fileName = `${Date.now()}-${uploadedFile.name}`;
+      const { data, error } = await supabase.storage
+        .from('face-images')
+        .upload(fileName, uploadedFile);
+      
+      if (error) throw error;
+      
+      const { data: { publicUrl } } = supabase.storage
+        .from('face-images')
+        .getPublicUrl(fileName);
+      
+      console.log('Image uploaded successfully:', publicUrl);
+      
       console.log('Calling analyze-face edge function...');
       const response = await supabase.functions.invoke('analyze-face', {
-        body: {
-          imageUrl
-        }
+        body: { imageUrl: publicUrl }
       });
+      
       console.log('Edge function response:', response);
 
-      // Check for FunctionsHttpError or FunctionsRelayError
       if (response.error) {
         console.error('Edge function error:', response.error);
         const errorMessage = response.error.message || '';
 
-        // Handle 402 Payment Required
         if (errorMessage.includes('402') || errorMessage.includes('non-2xx')) {
           throw new Error('💳 เครดิต Lovable AI หมดแล้ว\n\nกรุณาไปที่ Settings → Workspace → Usage เพื่อเติมเครดิต');
         }
         throw new Error(response.error.message || 'เกิดข้อผิดพลาดจากเซิร์ฟเวอร์');
       }
 
-      // Check for application-level errors
       if (response.data?.error) {
         console.error('Application error:', response.data.error);
         throw new Error(response.data.error);
       }
+      
       if (!response.data?.analysis) {
         throw new Error('ไม่ได้รับผลการวิเคราะห์จากเซิร์ฟเวอร์');
       }
+      
       console.log('Analysis result:', response.data);
       setAnalysis(response.data.analysis);
+      
       toast({
         title: "✨ วิเคราะห์สำเร็จ",
         description: "ได้รับผลการวิเคราะห์จาก AI แล้ว"
       });
     } catch (error: any) {
       console.error('Analysis error details:', error);
-
-      // If it's the special "existing analysis" error, just return (already set analysis)
-      if (error.message === 'EXISTING_ANALYSIS') {
-        return;
-      }
       const errorMessage = error.message || "ไม่สามารถวิเคราะห์ภาพได้ กรุณาลองใหม่อีกครั้ง";
+      
       toast({
         title: errorMessage.includes('เครดิต') ? "💳 เครดิต AI หมด" : "เกิดข้อผิดพลาด",
         description: errorMessage,
@@ -229,17 +117,16 @@ const Index = () => {
     }
   };
   const resetAll = () => {
-    stopCamera();
-    setBeforeImage(null);
-    setAnalysis(null);
+    setUploadedFile(null);
     setUploadedImageUrl('');
+    setAnalysis(null);
   };
   const handleConsentAccept = () => {
     setConsentAccepted(true);
     setShowConsent(false);
     // Start analysis after consent
-    if (beforeImage) {
-      performAnalysisFromCamera(beforeImage);
+    if (uploadedFile) {
+      performAnalysis();
     }
   };
   const generateResultImage = async () => {
@@ -424,72 +311,78 @@ const Index = () => {
           <Card className="border-2 border-[#E91E8C]/20 glass-card shadow-card overflow-hidden">
             <div className="bg-gradient-to-r from-[#E91E8C] to-[#F06292] px-4 py-3">
               <h2 className="text-white font-bold text-lg flex items-center gap-2">
-                <Camera className="w-5 h-5" />
-                สแกนใบหน้าด้วย AI
+                <Upload className="w-5 h-5" />
+                อัพโหลดรูปใบหน้า
               </h2>
             </div>
             
             <div className="p-4">
-              {!beforeImage && !showCamera && (
-                <div 
-                  className="border-2 border-dashed border-[#E91E8C]/30 rounded-2xl p-8 md:p-12 text-center 
-                           hover:border-[#E91E8C] hover:bg-[#FFF0F5]/50 transition-all cursor-pointer active:scale-95" 
-                  onClick={startCamera}
-                >
-                  <div className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#E91E8C] to-[#F06292] 
-                                flex items-center justify-center animate-pulse">
-                    <Camera className="w-8 h-8 md:w-10 md:h-10 text-white" />
-                  </div>
-                  <p className="text-[#C2185B] font-semibold mb-2 text-base md:text-lg">
-                    เปิดกล้องสแกนหน้า
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    ระบบจะสแกนและวิเคราะห์ใบหน้าอัตโนมัติ
-                  </p>
-                </div>
-              )}
-              
-              {showCamera && (
-                <div className="space-y-3">
-                  <div className="relative rounded-2xl overflow-hidden border-2 border-[#E91E8C]/30">
-                    <video 
-                      ref={videoRef}
-                      autoPlay 
-                      playsInline
-                      className="w-full h-auto scale-x-[-1]"
-                      style={{ transform: 'scaleX(-1)' }}
-                    />
-                    <div className="absolute inset-0 pointer-events-none">
-                      {/* Face detection guide overlay */}
-                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-80 border-4 border-[#E91E8C] rounded-full opacity-50"></div>
+              {!uploadedImageUrl && (
+                <div className="border-2 border-dashed border-[#E91E8C]/30 rounded-2xl p-8 md:p-12 text-center 
+                             hover:border-[#E91E8C] hover:bg-[#FFF0F5]/50 transition-all">
+                  <label htmlFor="file-upload" className="cursor-pointer">
+                    <div className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#E91E8C] to-[#F06292] 
+                                  flex items-center justify-center animate-pulse">
+                      <Upload className="w-8 h-8 md:w-10 md:h-10 text-white" />
                     </div>
-                  </div>
-                  <div className="text-center text-sm text-[#C2185B] font-semibold animate-pulse">
-                    กำลังสแกนใบหน้า...
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    onClick={stopCamera}
-                    className="w-full border-2 border-[#E91E8C]/30 text-[#C2185B] hover:bg-[#FFF0F5] font-semibold"
-                  >
-                    ยกเลิก
-                  </Button>
+                    <p className="text-[#C2185B] font-semibold mb-2 text-base md:text-lg">
+                      อัพโหลดรูปภาพ
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      คลิกเพื่อเลือกรูปภาพจากเครื่อง
+                    </p>
+                    <input
+                      id="file-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
+                  </label>
                 </div>
               )}
               
-              {beforeImage && !showCamera && (
+              {uploadedImageUrl && !analysis && (
                 <div className="space-y-3">
                   <div className="relative rounded-2xl overflow-hidden border-2 border-[#E91E8C]/30">
-                    <img src={beforeImage} alt="Scanned Face" className="w-full h-auto" />
+                    <img src={uploadedImageUrl} alt="Uploaded Face" className="w-full h-auto" />
                   </div>
-                  <Button 
-                    variant="outline" 
-                    onClick={startCamera}
-                    className="w-full border-2 border-[#E91E8C]/30 text-[#C2185B] hover:bg-[#FFF0F5] font-semibold"
-                  >
-                    <Camera className="w-4 h-4 mr-2" />
-                    สแกนใหม่
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={performAnalysis}
+                      disabled={analyzing}
+                      className="flex-1 bg-gradient-to-r from-[#E91E8C] to-[#F06292] hover:opacity-90 font-semibold h-12"
+                    >
+                      {analyzing ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          กำลังวิเคราะห์...
+                        </>
+                      ) : (
+                        "วิเคราะห์ใบหน้า"
+                      )}
+                    </Button>
+                    <label htmlFor="file-upload-new" className="flex-1">
+                      <Button 
+                        variant="outline"
+                        className="w-full border-2 border-[#E91E8C]/30 text-[#C2185B] hover:bg-[#FFF0F5] font-semibold h-12"
+                        type="button"
+                        asChild
+                      >
+                        <div>
+                          <Upload className="w-4 h-4 mr-2" />
+                          อัพโหลดใหม่
+                        </div>
+                      </Button>
+                      <input
+                        id="file-upload-new"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
                 </div>
               )}
             </div>
@@ -497,7 +390,7 @@ const Index = () => {
         </div>
 
         {/* Analyzing Status */}
-        {beforeImage && analyzing && (
+        {uploadedImageUrl && analyzing && (
           <Card className="border-2 border-[#E91E8C]/20 glass-card shadow-card p-6 mb-6">
             <div className="flex items-center justify-center gap-3">
               <Loader2 className="w-6 h-6 text-[#E91E8C] animate-spin" />
@@ -507,7 +400,7 @@ const Index = () => {
         )}
 
         {/* Action Buttons */}
-        {beforeImage && (
+        {analysis && (
           <div className="flex justify-center mb-6">
             <Button onClick={resetAll} variant="outline" className="border-2 border-gray-300 text-gray-600 hover:bg-gray-50 font-semibold h-12">
               เริ่มใหม่
@@ -687,7 +580,7 @@ const Index = () => {
 
         {/* Hidden Result Image for Generation */}
         <div className="fixed -left-[9999px] -top-[9999px]">
-          {analysis && beforeImage && <ResultImage key={`result-${Date.now()}`} ref={resultImageRef} analysis={analysis} imageUrl={beforeImage} />}
+          {analysis && uploadedImageUrl && <ResultImage key={`result-${Date.now()}`} ref={resultImageRef} analysis={analysis} imageUrl={uploadedImageUrl} />}
         </div>
           <div className="bg-gradient-to-r from-[#E91E8C] via-[#F06292] to-[#E91E8C] px-4 py-4">
             <div className="text-center">
