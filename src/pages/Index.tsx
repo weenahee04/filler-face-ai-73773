@@ -44,8 +44,13 @@ const Index = () => {
       }
       toast({
         title: "✅ เปิดกล้องสำเร็จ",
-        description: "จัดท่าให้ใบหน้าอยู่ในกรอบแล้วกดถ่ายรูป"
+        description: "กำลังสแกนใบหน้าอัตโนมัติ..."
       });
+      
+      // Auto-scan after 3 seconds
+      setTimeout(() => {
+        capturePhoto();
+      }, 3000);
     } catch (error) {
       console.error('Error accessing camera:', error);
       toast({
@@ -74,15 +79,27 @@ const Index = () => {
       canvas.height = video.videoHeight;
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        ctx.drawImage(video, 0, 0);
+        // Mirror the captured image back to normal
+        ctx.scale(-1, 1);
+        ctx.drawImage(video, -canvas.width, 0);
         const imageData = canvas.toDataURL('image/jpeg');
         setBeforeImage(imageData);
         setAnalysis(null);
         stopCamera();
+        
         toast({
-          title: "✅ ถ่ายรูปสำเร็จ",
-          description: "กดปุ่ม 'วิเคราะห์ด้วย AI' เพื่อเริ่มวิเคราะห์"
+          title: "✅ สแกนใบหน้าสำเร็จ",
+          description: "กำลังเริ่มวิเคราะห์ด้วย AI..."
         });
+        
+        // Auto-analyze after capture
+        setTimeout(() => {
+          if (!consentAccepted) {
+            setShowConsent(true);
+          } else {
+            performAnalysis();
+          }
+        }, 500);
       }
     }
   };
@@ -443,7 +460,7 @@ const Index = () => {
                     เปิดกล้องเพื่อถ่ายรูป
                   </Button>
                   <p className="text-center text-sm text-gray-600">
-                    กดปุ่มด้านบนเพื่อเริ่มถ่ายภาพใบหน้า
+                    ระบบจะสแกนและวิเคราะห์ใบหน้าอัตโนมัติ
                   </p>
                 </div>
               ) : cameraActive ? (
@@ -473,30 +490,22 @@ const Index = () => {
                         
                         {/* Text instruction */}
                         <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
-                          <p className="text-white font-bold text-sm bg-[#E91E8C]/80 px-4 py-2 rounded-full shadow-lg">
-                            จัดใบหน้าให้อยู่ในกรอบ
+                          <p className="text-white font-bold text-sm bg-[#E91E8C]/80 px-4 py-2 rounded-full shadow-lg animate-pulse">
+                            กำลังสแกนใบหน้า...
                           </p>
                         </div>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={capturePhoto}
-                      className="flex-1 h-14 bg-gradient-to-r from-[#E91E8C] to-[#F06292] hover:opacity-90 text-white font-semibold rounded-xl shadow-elegant"
-                    >
-                      <Camera className="w-5 h-5 mr-2" />
-                      ถ่ายรูป
-                    </Button>
-                    <Button
-                      onClick={stopCamera}
-                      variant="outline"
-                      className="h-14 px-6 border-2 border-gray-300 rounded-xl"
-                    >
-                      <X className="w-5 h-5" />
-                    </Button>
-                  </div>
+                  <Button
+                    onClick={stopCamera}
+                    variant="outline"
+                    className="w-full h-12 border-2 border-gray-300 rounded-xl hover:bg-gray-50"
+                  >
+                    <X className="w-5 h-5 mr-2" />
+                    ยกเลิก
+                  </Button>
                 </div>
               ) : (
                 <div className="space-y-3">
