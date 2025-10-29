@@ -201,25 +201,25 @@ export const FaceScanner = ({ onCapture, onClose }: FaceScannerProps) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black z-50 flex flex-col">
-      {/* Compact Header */}
-      <div className="bg-gradient-to-r from-[#E91E8C] to-[#F06292] px-3 py-2.5 flex-shrink-0">
-        <div className="flex items-center justify-between max-w-screen-xl mx-auto">
+    <div className="fixed inset-0 bg-black z-50 flex flex-col overflow-hidden">
+      {/* Fixed Compact Header */}
+      <div className="bg-gradient-to-r from-[#E91E8C] to-[#F06292] px-3 py-2.5 flex-shrink-0 shadow-lg">
+        <div className="flex items-center justify-between gap-2">
           <Button
             onClick={handleClose}
             variant="ghost"
             size="sm"
-            className="text-white hover:bg-white/20 font-semibold h-9 px-3"
+            className="text-white hover:bg-white/20 font-semibold h-8 px-2 flex-shrink-0"
           >
-            <ArrowLeft className="w-4 h-4 mr-1.5" />
-            <span className="text-sm">ย้อนกลับ</span>
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            <span className="text-sm">กลับ</span>
           </Button>
-          <h2 className="text-white font-bold text-base">สแกนใบหน้า</h2>
+          <h2 className="text-white font-bold text-sm flex-1 text-center truncate">สแกนใบหน้า AI</h2>
           <Button
             onClick={() => setShowInstructions(!showInstructions)}
             variant="ghost"
             size="sm"
-            className="text-white hover:bg-white/20 h-9 w-9 p-0"
+            className="text-white hover:bg-white/20 h-8 w-8 p-0 flex-shrink-0"
             title="คำแนะนำ"
           >
             <Info className="w-4 h-4" />
@@ -229,39 +229,37 @@ export const FaceScanner = ({ onCapture, onClose }: FaceScannerProps) => {
 
       {/* Compact Instructions */}
       {showInstructions && !isLoading && (
-        <div className="bg-gradient-to-br from-purple-900/95 to-pink-900/95 px-3 py-3 border-b border-white/10 flex-shrink-0">
-          <div className="max-w-screen-xl mx-auto">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-white font-bold text-sm flex items-center gap-1.5">
-                <Info className="w-3.5 h-3.5" />
-                คำแนะนำ
-              </h3>
-              <Button
-                onClick={() => setShowInstructions(false)}
-                variant="ghost"
-                size="sm"
-                className="text-white/80 hover:text-white h-6 text-xs px-2"
-              >
-                ซ่อน
-              </Button>
+        <div className="bg-gradient-to-br from-purple-900/95 to-pink-900/95 px-3 py-2.5 border-b border-white/10 flex-shrink-0">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-white font-bold text-xs flex items-center gap-1">
+              <Info className="w-3 h-3" />
+              คำแนะนำ
+            </h3>
+            <Button
+              onClick={() => setShowInstructions(false)}
+              variant="ghost"
+              size="sm"
+              className="text-white/80 hover:text-white h-5 text-[10px] px-1.5"
+            >
+              ซ่อน
+            </Button>
+          </div>
+          <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-[10px] text-white/90">
+            <div className="flex items-center gap-1">
+              <span className="text-green-400">✓</span>
+              <span>วางหน้าตรงกลาง</span>
             </div>
-            <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs text-white/90">
-              <div className="flex items-center gap-1.5">
-                <span className="text-green-400 text-[10px]">✓</span>
-                <span>วางหน้าตรงกลาง</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-green-400 text-[10px]">✓</span>
-                <span>แสงสว่างเพียงพอ</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-green-400 text-[10px]">✓</span>
-                <span>มองตรงกล้อง</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-green-400 text-[10px]">✓</span>
-                <span>ถอดแว่นและหมวก</span>
-              </div>
+            <div className="flex items-center gap-1">
+              <span className="text-green-400">✓</span>
+              <span>แสงสว่างพอ</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-green-400">✓</span>
+              <span>มองตรงกล้อง</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-green-400">✓</span>
+              <span>ถอดแว่นหมวก</span>
             </div>
           </div>
         </div>
