@@ -114,7 +114,6 @@ export const FaceScanner = ({ onCapture, onClose }: FaceScannerProps) => {
     if (!ctx) return;
 
     let lastVideoTime = -1;
-    let consecutiveDetections = 0;
 
     const detectFaces = () => {
       if (video.currentTime === lastVideoTime) {
@@ -134,7 +133,6 @@ export const FaceScanner = ({ onCapture, onClose }: FaceScannerProps) => {
       const detections = faceDetector.detectForVideo(video, Date.now());
 
       if (detections.detections.length > 0) {
-        consecutiveDetections++;
         setFaceDetected(true);
 
         // Draw detection boxes
@@ -155,14 +153,7 @@ export const FaceScanner = ({ onCapture, onClose }: FaceScannerProps) => {
             });
           }
         });
-
-        // Auto capture after 3 consecutive detections (about 1 second)
-        if (consecutiveDetections >= 3) {
-          capturePhoto();
-          return;
-        }
       } else {
-        consecutiveDetections = 0;
         setFaceDetected(false);
       }
 
@@ -324,7 +315,7 @@ export const FaceScanner = ({ onCapture, onClose }: FaceScannerProps) => {
                     <>
                       <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
                       <Camera className="w-3.5 h-3.5" />
-                      <span>พบใบหน้า - กำลังถ่าย...</span>
+                      <span>พบใบหน้า - กดถ่ายภาพด้านล่าง</span>
                     </>
                   ) : (
                     <>
@@ -356,14 +347,15 @@ export const FaceScanner = ({ onCapture, onClose }: FaceScannerProps) => {
           <div className="max-w-sm mx-auto space-y-2">
             <Button
               onClick={capturePhoto}
+              disabled={!faceDetected}
               size="lg"
-              className="w-full bg-gradient-to-r from-[#E91E8C] to-[#F06292] hover:opacity-90 font-bold text-base h-12 shadow-xl"
+              className="w-full bg-gradient-to-r from-[#E91E8C] to-[#F06292] hover:opacity-90 font-bold text-base h-12 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Camera className="w-5 h-5 mr-2" />
-              ถ่ายภาพด้วยตัวเอง
+              ถ่ายภาพ
             </Button>
             <p className="text-white/50 text-[10px] text-center leading-tight">
-              หรือรอให้ระบบถ่ายอัตโนมัติ
+              กดปุ่มเมื่อพบใบหน้าในกรอบ
             </p>
           </div>
         </div>
