@@ -143,15 +143,19 @@ const Index = () => {
       console.log('Edge function response:', response);
       if (response.error) {
         console.error('Edge function error:', response.error);
-        const errorMessage = response.error.message || '';
-        if (errorMessage.includes('402') || errorMessage.includes('non-2xx')) {
-          throw new Error('💳 เครดิต Lovable AI หมดแล้ว\n\nกรุณาไปที่ Settings → Workspace → Usage เพื่อเติมเครดิต');
-        }
         throw new Error(response.error.message || 'เกิดข้อผิดพลาดจากเซิร์ฟเวอร์');
       }
       if (response.data?.error) {
         console.error('Application error:', response.data.error);
-        throw new Error(response.data.error);
+        const errorMsg = response.data.error;
+        // Check for specific error types
+        if (errorMsg.includes('402') || errorMsg.includes('เติมเครดิต')) {
+          throw new Error('💳 เครดิต Lovable AI หมดแล้ว\n\nกรุณาไปที่ Settings → Workspace → Usage เพื่อเติมเครดิต');
+        }
+        if (errorMsg.includes('429') || errorMsg.includes('ขอบเขตการใช้งาน')) {
+          throw new Error('⏱️ เกินขอบเขตการใช้งาน\n\nกรุณารอสักครู่แล้วลองใหม่อีกครั้ง');
+        }
+        throw new Error(errorMsg);
       }
       if (!response.data?.analysis) {
         throw new Error('ไม่ได้รับผลการวิเคราะห์จากเซิร์ฟเวอร์');

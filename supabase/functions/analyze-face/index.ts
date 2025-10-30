@@ -45,7 +45,16 @@ serve(async (req) => {
       }
       
       const imageBuffer = await imageResponse.arrayBuffer();
-      const base64 = btoa(String.fromCharCode(...new Uint8Array(imageBuffer)));
+      const uint8Array = new Uint8Array(imageBuffer);
+      
+      // Convert to base64 in chunks to avoid call stack size exceeded
+      let binary = '';
+      const chunkSize = 0x8000; // 32KB chunks
+      for (let i = 0; i < uint8Array.length; i += chunkSize) {
+        const chunk = uint8Array.subarray(i, Math.min(i + chunkSize, uint8Array.length));
+        binary += String.fromCharCode.apply(null, Array.from(chunk));
+      }
+      const base64 = btoa(binary);
       imageBase64 = `data:image/jpeg;base64,${base64}`;
       console.log('Image converted to base64, length:', imageBase64.length);
     } catch (downloadError) {
