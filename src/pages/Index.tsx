@@ -16,10 +16,12 @@ const Index = () => {
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string>('');
   const [analyzing, setAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<any>(null);
+  const [analysisId, setAnalysisId] = useState<string>('');
   const [showConsent, setShowConsent] = useState(false);
   const [consentAccepted, setConsentAccepted] = useState(false);
   const [generatingImage, setGeneratingImage] = useState(false);
   const [showFaceScanner, setShowFaceScanner] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
   const resultImageRef = useRef<HTMLDivElement>(null);
   const {
     toast
@@ -162,6 +164,29 @@ const Index = () => {
       }
       console.log('Analysis result:', response.data);
       setAnalysis(response.data.analysis);
+
+      // Save analysis to database
+      try {
+        const { data: savedAnalysis, error: saveError } = await (supabase as any)
+          .from('face_analyses')
+          .insert({
+            image_url: publicUrl,
+            analysis_result: response.data.analysis,
+            customer_id: '00000000-0000-0000-0000-000000000000' // Default customer ID for anonymous
+          })
+          .select()
+          .single();
+
+        if (saveError) {
+          console.error('Error saving analysis:', saveError);
+        } else if (savedAnalysis) {
+          setAnalysisId(savedAnalysis.id);
+          console.log('Analysis saved with ID:', savedAnalysis.id);
+        }
+      } catch (saveErr) {
+        console.error('Failed to save analysis:', saveErr);
+      }
+
       toast({
         title: "✨ วิเคราะห์สำเร็จ",
         description: "ได้รับผลการวิเคราะห์จาก AI แล้ว"
@@ -218,6 +243,7 @@ const Index = () => {
     setUploadedFile(null);
     setUploadedImageUrl('');
     setAnalysis(null);
+    setAnalysisId('');
     setShowFaceScanner(false);
   };
   const handleConsentAccept = () => {
@@ -254,61 +280,41 @@ const Index = () => {
       setGeneratingImage(false);
     }
   };
-  const handleDownload = async () => {
-    const canvas = await generateResultImage();
-    if (!canvas) return;
-    canvas.toBlob(blob => {
-      if (!blob) return;
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `singderm-analysis-${Date.now()}.png`;
-      link.click();
-      URL.revokeObjectURL(url);
+  const handleDownload = () => {
+    if (!analysisId) {
       toast({
-        title: "✅ ดาวน์โหลดสำเร็จ",
-        description: "บันทึกรูปแล้ว สามารถแชร์ใน Instagram Story ได้"
+        title: "เกิดข้อผิดพลาด",
+        description: "ไม่พบข้อมูลการวิเคราะห์",
+        variant: "destructive"
       });
+      return;
+    }
+    setShowShareDialog(true);
+  };
+
+  const handleShare = () => {
+    if (!analysisId) {
+      toast({
+        title: "เกิดข้อผิดพลาด",
+        description: "ไม่พบข้อมูลการวิเคราะห์",
+        variant: "destructive"
+      });
+      return;
+    }
+    setShowShareDialog(true);
+  };
+
+  const copyProfileLink = () => {
+    const profileUrl = `${window.location.origin}/profile/${analysisId}`;
+    navigator.clipboard.writeText(profileUrl);
+    toast({
+      title: "✅ คัดลอกลิงก์แล้ว",
+      description: "สามารถนำไปแชร์ได้เลย"
     });
   };
-  const handleShare = async () => {
-    const canvas = await generateResultImage();
-    if (!canvas) return;
-    canvas.toBlob(async blob => {
-      if (!blob) return;
-      const file = new File([blob], 'singderm-analysis.png', {
-        type: 'image/png'
-      });
-      if (navigator.share && navigator.canShare({
-        files: [file]
-      })) {
-        try {
-          await navigator.share({
-            files: [file],
-            title: 'ผลการวิเคราะห์ใบหน้า AI - Singderm',
-            text: 'ดูผลการวิเคราะห์ใบหน้าของฉัน!'
-          });
-          toast({
-            title: "✅ แชร์สำเร็จ",
-            description: "แชร์ผลการวิเคราะห์แล้ว"
-          });
-        } catch (error) {
-          if ((error as Error).name !== 'AbortError') {
-            console.error('Error sharing:', error);
-            toast({
-              title: "เกิดข้อผิดพลาด",
-              description: "ไม่สามารถแชร์ได้ กรุณาลองดาวน์โหลดแทน",
-              variant: "destructive"
-            });
-          }
-        }
-      } else {
-        toast({
-          title: "ไม่รองรับการแชร์",
-          description: "กรุณาดาวน์โหลดรูปและแชร์ใน Instagram แทน"
-        });
-      }
-    });
+
+  const openProfile = () => {
+    navigate(`/profile/${analysisId}`);
   };
   return <div className="min-h-screen bg-gradient-to-br from-white via-[#FFF0F5] to-[#FFE4F0] water-ripple-bg">
       {/* Face Scanner */}
@@ -357,6 +363,58 @@ const Index = () => {
             <Button onClick={handleConsentAccept} className="w-full sm:w-auto bg-gradient-to-r from-[#E91E8C] to-[#F06292] hover:opacity-90 font-semibold">
               <CheckCircle2 className="w-4 h-4 mr-2" />
               ยอมรับและดำเนินการต่อ
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Share Link Dialog */}
+      <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
+        <DialogContent className="sm:max-w-[500px] border-2 border-[#E91E8C]/20">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-[#C2185B] flex items-center gap-2">
+              <Share2 className="w-6 h-6 text-[#E91E8C]" />
+              แชร์ผลการวิเคราะห์
+            </DialogTitle>
+            <DialogDescription className="text-base text-gray-700 pt-4">
+              <div className="space-y-4">
+                <div className="p-4 bg-gradient-to-r from-[#FFF0F5] to-[#FFE4F0] rounded-xl border border-[#E91E8C]/20">
+                  <p className="text-sm font-semibold text-[#C2185B] mb-2">
+                    ลิงก์โปรไฟล์การวิเคราะห์ของคุณ
+                  </p>
+                  <div className="bg-white rounded-lg p-3 mb-3 border border-[#E91E8C]/20">
+                    <p className="text-xs text-gray-600 break-all font-mono">
+                      {`${window.location.origin}/profile/${analysisId}`}
+                    </p>
+                  </div>
+                  <p className="text-xs text-gray-600">
+                    คัดลอกลิงก์นี้เพื่อแชร์ผลการวิเคราะห์กับผู้อื่น หรือบันทึกไว้ดูภายหลัง
+                  </p>
+                </div>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowShareDialog(false)}
+              className="w-full sm:w-auto border-2 border-gray-300"
+            >
+              ปิด
+            </Button>
+            <Button
+              onClick={copyProfileLink}
+              className="w-full sm:w-auto bg-gradient-to-r from-[#E91E8C] to-[#F06292] hover:opacity-90 font-semibold"
+            >
+              <Share2 className="w-4 h-4 mr-2" />
+              คัดลอกลิงก์
+            </Button>
+            <Button
+              onClick={openProfile}
+              className="w-full sm:w-auto bg-gradient-to-r from-[#C2185B] to-[#E91E8C] hover:opacity-90 font-semibold"
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
+              เปิดดู
             </Button>
           </DialogFooter>
         </DialogContent>
