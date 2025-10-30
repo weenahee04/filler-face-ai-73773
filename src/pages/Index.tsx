@@ -28,84 +28,70 @@ const Index = () => {
   const optimizeImage = async (file: File): Promise<File> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = e => {
         const img = new Image();
         img.onload = () => {
           // Calculate new dimensions (max width 800px)
           const MAX_WIDTH = 800;
           let width = img.width;
           let height = img.height;
-          
           if (width > MAX_WIDTH) {
-            height = (height * MAX_WIDTH) / width;
+            height = height * MAX_WIDTH / width;
             width = MAX_WIDTH;
           }
-          
+
           // Create canvas and resize
           const canvas = document.createElement('canvas');
           canvas.width = width;
           canvas.height = height;
-          
           const ctx = canvas.getContext('2d');
           if (!ctx) {
             reject(new Error('Cannot get canvas context'));
             return;
           }
-          
           ctx.drawImage(img, 0, 0, width, height);
-          
+
           // Convert to blob with compression
-          canvas.toBlob(
-            (blob) => {
-              if (!blob) {
-                reject(new Error('Failed to compress image'));
-                return;
-              }
-              
-              // Create optimized file
-              const optimizedFile = new File([blob], file.name, {
-                type: 'image/jpeg',
-                lastModified: Date.now(),
-              });
-              
-              console.log('Image optimization:');
-              console.log('Original size:', (file.size / 1024).toFixed(2), 'KB');
-              console.log('Optimized size:', (optimizedFile.size / 1024).toFixed(2), 'KB');
-              console.log('Reduction:', ((1 - optimizedFile.size / file.size) * 100).toFixed(1), '%');
-              
-              resolve(optimizedFile);
-            },
-            'image/jpeg',
-            0.85 // Quality 85%
+          canvas.toBlob(blob => {
+            if (!blob) {
+              reject(new Error('Failed to compress image'));
+              return;
+            }
+
+            // Create optimized file
+            const optimizedFile = new File([blob], file.name, {
+              type: 'image/jpeg',
+              lastModified: Date.now()
+            });
+            console.log('Image optimization:');
+            console.log('Original size:', (file.size / 1024).toFixed(2), 'KB');
+            console.log('Optimized size:', (optimizedFile.size / 1024).toFixed(2), 'KB');
+            console.log('Reduction:', ((1 - optimizedFile.size / file.size) * 100).toFixed(1), '%');
+            resolve(optimizedFile);
+          }, 'image/jpeg', 0.85 // Quality 85%
           );
         };
-        
         img.onerror = () => reject(new Error('Failed to load image'));
         img.src = e.target?.result as string;
       };
-      
       reader.onerror = () => reject(new Error('Failed to read file'));
       reader.readAsDataURL(file);
     });
   };
-
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    
     try {
       toast({
         title: "⚙️ กำลังเตรียมรูปภาพ...",
         description: "กำลัง optimize รูปภาพ"
       });
-      
+
       // Optimize image before upload
       const optimizedFile = await optimizeImage(file);
       setUploadedFile(optimizedFile);
-      
       const imageUrl = URL.createObjectURL(optimizedFile);
       setUploadedImageUrl(imageUrl);
-      
       toast({
         title: "✅ อัพโหลดสำเร็จ",
         description: "รูปภาพถูก optimize แล้ว พร้อมทำการวิเคราะห์"
@@ -124,7 +110,6 @@ const Index = () => {
       });
     }
   };
-  
   const performAnalysis = async () => {
     if (!uploadedFile) {
       toast({
@@ -133,54 +118,46 @@ const Index = () => {
       });
       return;
     }
-
     console.log('Starting analysis from uploaded file...');
     setAnalyzing(true);
-    
     try {
       console.log('Uploading image to storage...', uploadedFile.name);
       const fileName = `${Date.now()}-${uploadedFile.name}`;
-      const { data, error } = await supabase.storage
-        .from('face-images')
-        .upload(fileName, uploadedFile);
-      
+      const {
+        data,
+        error
+      } = await supabase.storage.from('face-images').upload(fileName, uploadedFile);
       if (error) throw error;
-      
-      const { data: { publicUrl } } = supabase.storage
-        .from('face-images')
-        .getPublicUrl(fileName);
-      
+      const {
+        data: {
+          publicUrl
+        }
+      } = supabase.storage.from('face-images').getPublicUrl(fileName);
       console.log('Image uploaded successfully:', publicUrl);
-      
       console.log('Calling analyze-face edge function...');
       const response = await supabase.functions.invoke('analyze-face', {
-        body: { imageUrl: publicUrl }
+        body: {
+          imageUrl: publicUrl
+        }
       });
-      
       console.log('Edge function response:', response);
-
       if (response.error) {
         console.error('Edge function error:', response.error);
         const errorMessage = response.error.message || '';
-
         if (errorMessage.includes('402') || errorMessage.includes('non-2xx')) {
           throw new Error('💳 เครดิต Lovable AI หมดแล้ว\n\nกรุณาไปที่ Settings → Workspace → Usage เพื่อเติมเครดิต');
         }
         throw new Error(response.error.message || 'เกิดข้อผิดพลาดจากเซิร์ฟเวอร์');
       }
-
       if (response.data?.error) {
         console.error('Application error:', response.data.error);
         throw new Error(response.data.error);
       }
-      
       if (!response.data?.analysis) {
         throw new Error('ไม่ได้รับผลการวิเคราะห์จากเซิร์ฟเวอร์');
       }
-      
       console.log('Analysis result:', response.data);
       setAnalysis(response.data.analysis);
-      
       toast({
         title: "✨ วิเคราะห์สำเร็จ",
         description: "ได้รับผลการวิเคราะห์จาก AI แล้ว"
@@ -188,7 +165,6 @@ const Index = () => {
     } catch (error: any) {
       console.error('Analysis error details:', error);
       const errorMessage = error.message || "ไม่สามารถวิเคราะห์ภาพได้ กรุณาลองใหม่อีกครั้ง";
-      
       toast({
         title: errorMessage.includes('เครดิต') ? "💳 เครดิต AI หมด" : "เกิดข้อผิดพลาด",
         description: errorMessage,
@@ -204,23 +180,23 @@ const Index = () => {
       // Convert base64 to File
       const base64Response = await fetch(imageData);
       const blob = await base64Response.blob();
-      const file = new File([blob], `face-scan-${Date.now()}.jpg`, { type: 'image/jpeg' });
-      
+      const file = new File([blob], `face-scan-${Date.now()}.jpg`, {
+        type: 'image/jpeg'
+      });
+
       // Optimize the captured image
       toast({
         title: "⚙️ กำลังเตรียมรูปภาพ...",
         description: "กำลัง optimize รูปภาพ"
       });
-      
       const optimizedFile = await optimizeImage(file);
       setUploadedFile(optimizedFile);
       setUploadedImageUrl(imageData);
-      
       toast({
         title: "✅ ถ่ายภาพสำเร็จ",
         description: "พร้อมทำการวิเคราะห์"
       });
-      
+
       // Auto show consent if not accepted
       if (!consentAccepted) {
         setShowConsent(true);
@@ -234,7 +210,6 @@ const Index = () => {
       });
     }
   };
-
   const resetAll = () => {
     setUploadedFile(null);
     setUploadedImageUrl('');
@@ -333,12 +308,7 @@ const Index = () => {
   };
   return <div className="min-h-screen bg-gradient-to-br from-white via-[#FFF0F5] to-[#FFE4F0] water-ripple-bg">
       {/* Face Scanner */}
-      {showFaceScanner && (
-        <FaceScanner
-          onCapture={handleFaceCapture}
-          onClose={() => setShowFaceScanner(false)}
-        />
-      )}
+      {showFaceScanner && <FaceScanner onCapture={handleFaceCapture} onClose={() => setShowFaceScanner(false)} />}
 
       {/* Consent Dialog */}
       <Dialog open={showConsent} onOpenChange={setShowConsent}>
@@ -435,8 +405,7 @@ const Index = () => {
         </Card>
 
         {/* Feature Selection (only show when no image uploaded) */}
-        {!uploadedImageUrl && !analysis && (
-          <div className="mb-6 p-6 bg-white/80 backdrop-blur-sm rounded-2xl border-2 border-[#E91E8C]/20 shadow-card">
+        {!uploadedImageUrl && !analysis && <div className="mb-6 p-6 bg-white/80 backdrop-blur-sm rounded-2xl border-2 border-[#E91E8C]/20 shadow-card">
             <div className="text-center mb-4">
               <h3 className="text-xl font-bold text-[#C2185B] mb-2">เริ่มต้นวิเคราะห์ใบหน้า</h3>
               <p className="text-sm text-gray-600">เลือกวิธีการที่คุณต้องการ</p>
@@ -444,12 +413,9 @@ const Index = () => {
             
             <div className="grid md:grid-cols-2 gap-4">
               {/* Face Scan Option */}
-              <div 
-                className="group border-2 border-[#E91E8C]/30 rounded-2xl p-6 text-center 
+              <div className="group border-2 border-[#E91E8C]/30 rounded-2xl p-6 text-center 
                          hover:border-[#E91E8C] hover:bg-[#FFF0F5]/50 transition-all cursor-pointer 
-                         hover:scale-105 active:scale-95"
-                onClick={() => setShowFaceScanner(true)}
-              >
+                         hover:scale-105 active:scale-95" onClick={() => setShowFaceScanner(true)}>
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#E91E8C] to-[#F06292] 
                               flex items-center justify-center group-hover:scale-110 transition-transform">
                   <Camera className="w-8 h-8 text-white" />
@@ -488,21 +454,13 @@ const Index = () => {
                     <span>✓ เลือกรูปที่ชอบ</span>
                   </div>
                 </div>
-                <input
-                  id="file-upload-choice"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
+                <input id="file-upload-choice" type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
               </label>
             </div>
-          </div>
-        )}
+          </div>}
 
         {/* Image Preview & Analysis Section (only show when image is uploaded) */}
-        {uploadedImageUrl && (
-          <Card className="mb-6 border-2 border-[#E91E8C]/20 glass-card shadow-card overflow-hidden">
+        {uploadedImageUrl && <Card className="mb-6 border-2 border-[#E91E8C]/20 glass-card shadow-card overflow-hidden">
             <div className="bg-gradient-to-r from-[#E91E8C] to-[#F06292] px-4 py-3">
               <h2 className="text-white font-bold text-lg flex items-center gap-2">
                 <Sparkles className="w-5 h-5" />
@@ -515,53 +473,33 @@ const Index = () => {
                 {/* Image Preview */}
                 <div className="relative rounded-2xl overflow-hidden border-2 border-[#E91E8C]/30 group">
                   <img src={uploadedImageUrl} alt="Uploaded Face" className="w-full h-auto" />
-                  {!analysis && (
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4">
+                  {!analysis && <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4">
                       <p className="text-white text-sm font-medium">รูปภาพพร้อมวิเคราะห์</p>
-                    </div>
-                  )}
+                    </div>}
                 </div>
 
                 {/* Action Buttons */}
-                {!analysis && (
-                  <div className="grid grid-cols-2 gap-3">
-                    <Button 
-                      onClick={performAnalysis}
-                      disabled={analyzing}
-                      size="lg"
-                      className="bg-gradient-to-r from-[#E91E8C] to-[#F06292] hover:opacity-90 font-semibold"
-                    >
-                      {analyzing ? (
-                        <>
+                {!analysis && <div className="grid grid-cols-2 gap-3">
+                    <Button onClick={performAnalysis} disabled={analyzing} size="lg" className="bg-gradient-to-r from-[#E91E8C] to-[#F06292] hover:opacity-90 font-semibold">
+                      {analyzing ? <>
                           <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                           วิเคราะห์...
-                        </>
-                      ) : (
-                        <>
+                        </> : <>
                           <Sparkles className="w-5 h-5 mr-2" />
                           วิเคราะห์ใบหน้า
-                        </>
-                      )}
+                        </>}
                     </Button>
                     
-                    <Button 
-                      onClick={resetAll}
-                      variant="outline"
-                      size="lg"
-                      className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold"
-                    >
+                    <Button onClick={resetAll} variant="outline" size="lg" className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold">
                       เริ่มใหม่
                     </Button>
-                  </div>
-                )}
+                  </div>}
               </div>
             </div>
-          </Card>
-        )}
+          </Card>}
 
         {/* Analyzing Status */}
-        {analyzing && (
-          <Card className="border-2 border-[#E91E8C]/20 glass-card shadow-card overflow-hidden mb-6">
+        {analyzing && <Card className="border-2 border-[#E91E8C]/20 glass-card shadow-card overflow-hidden mb-6">
             <div className="bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-3">
               <h2 className="text-white font-bold text-lg flex items-center gap-2">
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -581,26 +519,21 @@ const Index = () => {
                   <p className="text-gray-600 text-sm">กรุณารอสักครู่...</p>
                 </div>
                 <div className="w-full max-w-xs bg-gray-200 rounded-full h-2 overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-[#E91E8C] to-[#F06292] animate-pulse" style={{ width: '70%' }} />
+                  <div className="h-full bg-gradient-to-r from-[#E91E8C] to-[#F06292] animate-pulse" style={{
+                width: '70%'
+              }} />
                 </div>
               </div>
             </div>
-          </Card>
-        )}
+          </Card>}
 
         {/* Reset Button (show after analysis) */}
-        {analysis && (
-          <div className="flex justify-center mb-6">
-            <Button 
-              onClick={resetAll} 
-              size="lg"
-              className="bg-gradient-to-r from-gray-600 to-gray-700 hover:opacity-90 text-white font-semibold shadow-lg"
-            >
+        {analysis && <div className="flex justify-center mb-6">
+            <Button onClick={resetAll} size="lg" className="bg-gradient-to-r from-gray-600 to-gray-700 hover:opacity-90 text-white font-semibold shadow-lg">
               <Upload className="w-5 h-5 mr-2" />
               วิเคราะห์รูปใหม่
             </Button>
-          </div>
-        )}
+          </div>}
 
         {/* Analysis Results */}
         {analysis && <Card className="border-2 border-[#E91E8C]/20 glass-card shadow-card overflow-hidden">
@@ -910,7 +843,7 @@ const Index = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex items-start gap-2">
                   <span className="text-lg mt-0.5">✓</span>
-                  <p className="text-sm">ผลิตภัณฑ์มาตรฐานสากลจากเกาหลี</p>
+                  <p className="text-sm">ผลิตภัณฑ์มาตรฐานสากลจากจีน</p>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-lg mt-0.5">✓</span>
