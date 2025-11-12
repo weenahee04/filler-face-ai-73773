@@ -24,11 +24,14 @@ export const FaceScanner = ({ onCapture, onClose }: FaceScannerProps) => {
   // Initialize MediaPipe Face Detector
   useEffect(() => {
     const initializeFaceDetector = async () => {
+      console.log('Initializing MediaPipe Face Detector...');
       try {
+        console.log('Loading vision tasks...');
         const vision = await FilesetResolver.forVisionTasks(
           "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
         );
         
+        console.log('Creating face detector...');
         const detector = await FaceDetector.createFromOptions(vision, {
           baseOptions: {
             modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite",
@@ -38,14 +41,16 @@ export const FaceScanner = ({ onCapture, onClose }: FaceScannerProps) => {
           minDetectionConfidence: 0.5
         });
         
+        console.log('Face detector initialized successfully');
         setFaceDetector(detector);
         setIsLoading(false);
       } catch (error) {
         console.error("Error initializing face detector:", error);
         toast({
           title: "เกิดข้อผิดพลาด",
-          description: "ไม่สามารถโหลดระบบตรวจจับใบหน้าได้",
-          variant: "destructive"
+          description: `ไม่สามารถโหลดระบบตรวจจับใบหน้าได้ (Error: ${error.message || error})`,
+          variant: "destructive",
+          duration: 10000
         });
         setIsLoading(false);
       }
@@ -63,7 +68,9 @@ export const FaceScanner = ({ onCapture, onClose }: FaceScannerProps) => {
   // Start camera
   useEffect(() => {
     const startCamera = async () => {
+      console.log('Starting camera initialization...');
       try {
+        console.log('Requesting camera access...');
         const mediaStream = await navigator.mediaDevices.getUserMedia({
           video: { 
             facingMode: "user",
@@ -72,32 +79,42 @@ export const FaceScanner = ({ onCapture, onClose }: FaceScannerProps) => {
           }
         });
         
+        console.log('Camera access granted, stream:', mediaStream);
         setStream(mediaStream);
         
         if (videoRef.current) {
           videoRef.current.srcObject = mediaStream;
           videoRef.current.onloadedmetadata = () => {
+            console.log('Video metadata loaded, starting playback...');
             videoRef.current?.play();
             setIsDetecting(true);
           };
+        } else {
+          console.error('Video ref is null');
         }
       } catch (error) {
         console.error("Error accessing camera:", error);
         toast({
           title: "ไม่สามารถเปิดกล้องได้",
-          description: "กรุณาอนุญาตให้เข้าถึงกล้องในการตั้งค่าเบราว์เซอร์",
-          variant: "destructive"
+          description: `กรุณาอนุญาตให้เข้าถึงกล้องในการตั้งค่าเบราว์เซอร์ (Error: ${error.message || error})`,
+          variant: "destructive",
+          duration: 10000
         });
       }
     };
 
+    console.log('Camera useEffect triggered. isLoading:', isLoading, 'faceDetector:', !!faceDetector);
     if (!isLoading && faceDetector) {
       startCamera();
     }
 
     return () => {
+      console.log('Cleaning up camera stream...');
       if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach(track => {
+          console.log('Stopping track:', track.kind);
+          track.stop();
+        });
       }
     };
   }, [isLoading, faceDetector, toast]);
