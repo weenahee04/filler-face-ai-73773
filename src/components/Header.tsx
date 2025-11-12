@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { Menu, MessageCircle, LogOut, User } from "lucide-react";
+import { Menu, MessageCircle, LogOut, User, UserCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useToast } from "@/components/ui/use-toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,11 +13,35 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { z } from "zod";
+
+const profileSchema = z.object({
+  full_name: z.string()
+    .trim()
+    .min(1, { message: "กรุณากรอกชื่อ" })
+    .max(100, { message: "ชื่อต้องไม่เกิน 100 ตัวอักษร" })
+    .regex(/^[a-zA-Zก-๙\s]+$/, { message: "ชื่อต้องเป็นตัวอักษรเท่านั้น" }),
+});
 
 export const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     // Check current session
@@ -35,6 +60,64 @@ export const Header = () => {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate("/");
+  };
+
+  const openEditDialog = () => {
+    setFullName(user?.user_metadata?.full_name || "");
+    setError("");
+    setEditDialogOpen(true);
+  };
+
+  const handleUpdateProfile = async () => {
+    setError("");
+
+    try {
+      // Validate input
+      const result = profileSchema.safeParse({ full_name: fullName });
+      
+      if (!result.success) {
+        setError(result.error.errors[0].message);
+        return;
+      }
+
+      setLoading(true);
+
+      // Update auth metadata
+      const { error: authError } = await supabase.auth.updateUser({
+        data: { full_name: fullName.trim() }
+      });
+
+      if (authError) throw authError;
+
+      // Update profiles table
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({ full_name: fullName.trim() })
+        .eq("id", user.id);
+
+      if (profileError) throw profileError;
+
+      toast({
+        title: "✅ อัปเดตสำเร็จ!",
+        description: "ชื่อของคุณถูกเปลี่ยนแปลงแล้ว",
+      });
+
+      setEditDialogOpen(false);
+
+      // Refresh session to get updated metadata
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
+
+    } catch (error: any) {
+      console.error("Error updating profile:", error);
+      toast({
+        title: "เกิดข้อผิดพลาด",
+        description: error.message || "ไม่สามารถอัปเดตโปรไฟล์ได้",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getUserDisplayName = () => {
@@ -84,6 +167,10 @@ export const Header = () => {
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuLabel>บัญชีของฉัน</DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={openEditDialog}>
+                    <UserCircle className="w-4 h-4 mr-2" />
+                    แก้ไขโปรไฟล์
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/consultation")}>
                     <MessageCircle className="w-4 h-4 mr-2" />
                     ปรึกษา AI
@@ -146,17 +233,30 @@ export const Header = () => {
               </Button>
 
               {user ? (
-                <Button 
-                  variant="outline"
-                  onClick={() => {
-                    handleSignOut();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="text-sm font-medium text-destructive justify-start"
-                >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  ออกจากระบบ
-                </Button>
+                <>
+                  <Button 
+                    variant="ghost"
+                    onClick={() => {
+                      openEditDialog();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="text-sm font-medium justify-start"
+                  >
+                    <UserCircle className="w-4 h-4 mr-2" />
+                    แก้ไขโปรไฟล์
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => {
+                      handleSignOut();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="text-sm font-medium text-destructive justify-start"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    ออกจากระบบ
+                  </Button>
+                </>
               ) : (
                 <Button 
                   variant="outline"
@@ -173,6 +273,49 @@ export const Header = () => {
           </nav>
         )}
       </div>
+
+      {/* Edit Profile Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>แก้ไขโปรไฟล์</DialogTitle>
+            <DialogDescription>
+              เปลี่ยนชื่อของคุณที่นี่
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="fullname">ชื่อ-นามสกุล</Label>
+              <Input
+                id="fullname"
+                placeholder="กรอกชื่อของคุณ"
+                value={fullName}
+                onChange={(e) => {
+                  setFullName(e.target.value);
+                  setError("");
+                }}
+                disabled={loading}
+                maxLength={100}
+              />
+              {error && (
+                <p className="text-sm text-destructive">{error}</p>
+              )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setEditDialogOpen(false)}
+              disabled={loading}
+            >
+              ยกเลิก
+            </Button>
+            <Button onClick={handleUpdateProfile} disabled={loading}>
+              {loading ? "กำลังบันทึก..." : "บันทึก"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </header>
   );
 };
