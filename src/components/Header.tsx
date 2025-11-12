@@ -151,6 +151,24 @@ export const Header = () => {
               <MessageCircle className="w-4 h-4 mr-2" />
               ปรึกษา AI
             </Button>
+
+            <Button 
+              variant="ghost"
+              onClick={() => navigate("/age-progression")}
+              className="text-sm font-medium"
+            >
+              <Clock className="w-4 h-4 mr-2" />
+              ดูหน้าในอนาคต
+            </Button>
+
+            <Button 
+              variant="ghost"
+              onClick={() => navigate("/skin-analysis")}
+              className="text-sm font-medium"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              วิเคราะห์ผิวหน้า
+            </Button>
             
             {user ? (
               <DropdownMenu>
@@ -170,18 +188,6 @@ export const Header = () => {
                   <DropdownMenuItem onClick={openEditDialog}>
                     <UserCircle className="w-4 h-4 mr-2" />
                     แก้ไขโปรไฟล์
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/consultation")}>
-                    <MessageCircle className="w-4 h-4 mr-2" />
-                    ปรึกษา AI
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/age-progression")}>
-                    <Clock className="w-4 h-4 mr-2" />
-                    ดูหน้าในอนาคต
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/skin-analysis")}>
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    วิเคราะห์ผิวหน้า
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
