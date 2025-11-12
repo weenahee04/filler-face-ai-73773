@@ -19,10 +19,19 @@ export const SimpleFaceScanner = ({ onCapture, onClose }: SimpleFaceScannerProps
   useEffect(() => {
     let mounted = true;
     let currentStream: MediaStream | null = null;
+    let loadingTimeout: NodeJS.Timeout | null = null;
     
     const startCamera = async () => {
       console.log('Starting camera...');
       setIsLoading(true);
+      
+      // Fallback: Force stop loading after 5 seconds
+      loadingTimeout = setTimeout(() => {
+        if (mounted) {
+          console.log('Forcing loading to stop after timeout');
+          setIsLoading(false);
+        }
+      }, 5000);
       
       try {
         console.log('Requesting camera access with facing mode:', facingMode);
@@ -36,6 +45,7 @@ export const SimpleFaceScanner = ({ onCapture, onClose }: SimpleFaceScannerProps
         
         if (!mounted) {
           mediaStream.getTracks().forEach(track => track.stop());
+          if (loadingTimeout) clearTimeout(loadingTimeout);
           return;
         }
 
@@ -45,23 +55,41 @@ export const SimpleFaceScanner = ({ onCapture, onClose }: SimpleFaceScannerProps
         
         if (videoRef.current) {
           videoRef.current.srcObject = mediaStream;
+          
+          // Add both events to ensure loading stops
           videoRef.current.onloadedmetadata = () => {
             if (!mounted) return;
-            console.log('Video metadata loaded, starting playback');
-            videoRef.current?.play().catch(err => {
-              console.error('Error playing video:', err);
-            });
+            console.log('Video metadata loaded');
+            if (loadingTimeout) clearTimeout(loadingTimeout);
             setIsLoading(false);
           };
+          
+          videoRef.current.onloadeddata = () => {
+            if (!mounted) return;
+            console.log('Video data loaded');
+            if (loadingTimeout) clearTimeout(loadingTimeout);
+            setIsLoading(false);
+          };
+          
+          // Start playing
+          videoRef.current.play().then(() => {
+            console.log('Video playing');
+            if (loadingTimeout) clearTimeout(loadingTimeout);
+            setIsLoading(false);
+          }).catch(err => {
+            console.error('Error playing video:', err);
+            if (loadingTimeout) clearTimeout(loadingTimeout);
+            setIsLoading(false);
+          });
+        } else {
+          console.log('No video ref, stopping loading');
+          if (loadingTimeout) clearTimeout(loadingTimeout);
+          setIsLoading(false);
         }
-
-        toast({
-          title: "✓ เปิดกล้องสำเร็จ",
-          description: "วางใบหน้าในกรอบและกดถ่ายภาพ"
-        });
       } catch (error) {
         console.error("Error accessing camera:", error);
         
+        if (loadingTimeout) clearTimeout(loadingTimeout);
         if (!mounted) return;
 
         let errorMessage = "กรุณาอนุญาตให้เข้าถึงกล้องในการตั้งค่าเบราว์เซอร์";
@@ -98,6 +126,7 @@ export const SimpleFaceScanner = ({ onCapture, onClose }: SimpleFaceScannerProps
 
     return () => {
       mounted = false;
+      if (loadingTimeout) clearTimeout(loadingTimeout);
       console.log('Cleaning up camera stream');
       if (currentStream) {
         currentStream.getTracks().forEach(track => track.stop());
