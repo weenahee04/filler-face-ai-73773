@@ -29,7 +29,7 @@ interface Post {
   user_id: string;
   category_id: string;
   forum_categories: { name: string };
-  profiles: { full_name: string | null };
+  profiles: { full_name: string | null } | null;
   comments_count?: number;
   likes_count?: number;
 }
@@ -237,10 +237,10 @@ const Forum = () => {
                       <div className="flex items-center gap-1">
                         <Avatar className="h-5 w-5">
                           <AvatarFallback className="text-xs bg-primary/10">
-                            {(post.profiles.full_name || "U").charAt(0)}
+                            {(post.profiles?.full_name || "U").charAt(0)}
                           </AvatarFallback>
                         </Avatar>
-                        <span>{post.profiles.full_name || "ไม่ระบุชื่อ"}</span>
+                        <span>{post.profiles?.full_name || "ไม่ระบุชื่อ"}</span>
                       </div>
                       
                       <div className="flex items-center gap-1">

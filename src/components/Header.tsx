@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Menu, MessageCircle, LogOut, User, UserCircle, Clock, Sparkles } from "lucide-react";
+import { Menu, MessageCircle, LogOut, User, UserCircle, Clock, Sparkles, Users } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -145,6 +145,15 @@ export const Header = () => {
           <nav className="hidden md:flex items-center gap-4">
             <Button 
               variant="ghost"
+              onClick={() => navigate("/forum")}
+              className="text-sm font-medium"
+            >
+              <Users className="w-4 h-4 mr-2" />
+              Forum
+            </Button>
+
+            <Button 
+              variant="ghost"
               onClick={() => navigate("/consultation")}
               className="text-sm font-medium"
             >
@@ -233,6 +242,18 @@ export const Header = () => {
                   </div>
                 </div>
               )}
+
+              <Button 
+                variant="ghost"
+                onClick={() => {
+                  navigate("/forum");
+                  setMobileMenuOpen(false);
+                }}
+                className="text-sm font-medium justify-start"
+              >
+                <Users className="w-4 h-4 mr-2" />
+                Forum
+              </Button>
 
               <Button 
                 variant="ghost"

@@ -11,6 +11,9 @@ import Auth from "./pages/Auth";
 import Consultation from "./pages/Consultation";
 import AgeProgression from "./pages/AgeProgression";
 import SkinAnalysis from "./pages/SkinAnalysis";
+import Forum from "./pages/Forum";
+import ForumCreate from "./pages/ForumCreate";
+import ForumPost from "./pages/ForumPost";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +33,9 @@ const App = () => (
           <Route path="/consultation" element={<Consultation />} />
           <Route path="/age-progression" element={<AgeProgression />} />
           <Route path="/skin-analysis" element={<SkinAnalysis />} />
+          <Route path="/forum" element={<Forum />} />
+          <Route path="/forum/create" element={<ForumCreate />} />
+          <Route path="/forum/post/:id" element={<ForumPost />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
