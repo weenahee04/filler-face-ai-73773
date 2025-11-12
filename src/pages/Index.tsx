@@ -167,7 +167,8 @@ const Index = () => {
         throw new Error('ไม่ได้รับผลการวิเคราะห์จากเซิร์ฟเวอร์');
       }
       console.log('Analysis result:', response.data);
-      setAnalysis(response.data.analysis);
+      const analysisData = response.data.analysis;
+      setAnalysis(analysisData);
 
       // Save analysis to database
       try {
@@ -175,7 +176,7 @@ const Index = () => {
           .from('face_analyses')
           .insert({
             image_url: publicUrl,
-            analysis_result: response.data.analysis,
+            analysis_result: analysisData,
             customer_id: '00000000-0000-0000-0000-000000000000' // Default customer ID for anonymous
           })
           .select()
@@ -193,8 +194,18 @@ const Index = () => {
 
       toast({
         title: "✨ วิเคราะห์สำเร็จ",
-        description: "ได้รับผลการวิเคราะห์จาก AI แล้ว"
+        description: "กำลังเปลี่ยนไปหน้าผลลัพธ์..."
       });
+
+      // Navigate to result page with analysis data
+      setTimeout(() => {
+        navigate('/result', {
+          state: {
+            analysis: analysisData,
+            imageUrl: publicUrl
+          }
+        });
+      }, 1000);
     } catch (error: any) {
       console.error('Analysis error details:', error);
       const errorMessage = error.message || "ไม่สามารถวิเคราะห์ภาพได้ กรุณาลองใหม่อีกครั้ง";
