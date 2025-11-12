@@ -25,17 +25,26 @@ export const FaceScanner = ({ onCapture, onClose }: FaceScannerProps) => {
   useEffect(() => {
     const initializeFaceDetector = async () => {
       console.log('Initializing MediaPipe Face Detector...');
+      
+      // Check WebGL support
+      const canvas = document.createElement('canvas');
+      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      
+      if (!gl) {
+        console.warn('WebGL not supported, using CPU delegate');
+      }
+      
       try {
         console.log('Loading vision tasks...');
         const vision = await FilesetResolver.forVisionTasks(
           "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
         );
         
-        console.log('Creating face detector...');
+        console.log('Creating face detector with CPU delegate...');
         const detector = await FaceDetector.createFromOptions(vision, {
           baseOptions: {
             modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite",
-            delegate: "GPU"
+            delegate: "CPU" // Changed from GPU to CPU for better compatibility
           },
           runningMode: "VIDEO",
           minDetectionConfidence: 0.5
@@ -46,13 +55,25 @@ export const FaceScanner = ({ onCapture, onClose }: FaceScannerProps) => {
         setIsLoading(false);
       } catch (error) {
         console.error("Error initializing face detector:", error);
+        
+        let errorMessage = "เบราว์เซอร์ของคุณไม่รองรับการตรวจจับใบหน้า";
+        
+        if (error.message && error.message.includes("INTERNAL")) {
+          errorMessage = "กรุณาลองใช้เบราว์เซอร์อื่น เช่น Chrome, Edge หรือ Safari เวอร์ชันล่าสุด";
+        }
+        
         toast({
-          title: "เกิดข้อผิดพลาด",
-          description: `ไม่สามารถโหลดระบบตรวจจับใบหน้าได้ (Error: ${error.message || error})`,
+          title: "ไม่สามารถเปิดระบบสแกนใบหน้าได้",
+          description: errorMessage,
           variant: "destructive",
           duration: 10000
         });
         setIsLoading(false);
+        
+        // Close scanner after showing error
+        setTimeout(() => {
+          onClose();
+        }, 3000);
       }
     };
 
@@ -63,7 +84,7 @@ export const FaceScanner = ({ onCapture, onClose }: FaceScannerProps) => {
         clearInterval(detectionIntervalRef.current);
       }
     };
-  }, [toast]);
+  }, [toast, onClose]);
 
   // Start camera
   useEffect(() => {
