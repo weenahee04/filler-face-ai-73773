@@ -46,11 +46,28 @@ const Index = () => {
   const [trendingPosts, setTrendingPosts] = useState<ForumPost[]>([]);
   const [popularPosts, setPopularPosts] = useState<ForumPost[]>([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
+  const [scrollY, setScrollY] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
   const resultImageRef = useRef<HTMLDivElement>(null);
   const {
     toast
   } = useToast();
   const navigate = useNavigate();
+
+  // Handle scroll for parallax effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Trigger animations on mount
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
   const optimizeImage = async (file: File): Promise<File> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -583,28 +600,36 @@ const Index = () => {
       </Dialog>
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/5 border-b border-border">
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+      <div 
+        className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/5 border-b border-border"
+        style={{
+          transform: `translateY(${scrollY * 0.3}px)`,
+          transition: 'transform 0.1s ease-out'
+        }}
+      >
+        <div className="absolute inset-0 bg-grid-pattern opacity-5" style={{
+          transform: `translateY(${scrollY * 0.5}px)`
+        }}></div>
         <div className="container mx-auto px-4 py-20 max-w-6xl relative">
           <div className="text-center space-y-6 max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 glass-card rounded-full shadow-soft border border-border mb-4">
+            <div className={`inline-flex items-center gap-2 px-4 py-2 glass-card rounded-full shadow-soft border border-border mb-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
               <Sparkles className="w-4 h-4 text-primary animate-pulse" />
               <span className="text-sm font-medium text-foreground">
                 AI-Powered Face Analysis
               </span>
             </div>
             
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
+            <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight transition-all duration-1000 delay-100 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
               วิเคราะห์ใบหน้าด้วย
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"> AI อัจฉริยะ</span>
             </h1>
             
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className={`text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto transition-all duration-1000 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
               ค้นพบศักยภาพความงามของคุณด้วยเทคโนโลยี AI ที่ทันสมัยที่สุด 
               วิเคราะห์ใบหน้าแบบละเอียด พร้อมคำแนะนำเฉพาะบุคคล
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+            <div className={`flex flex-col sm:flex-row gap-4 justify-center pt-4 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
               <Button 
                 size="lg" 
                 className="bg-primary hover:bg-primary-hover text-white font-semibold shadow-elegant hover:shadow-glow transition-all hover:scale-105 text-base px-8 py-6"
@@ -625,16 +650,16 @@ const Index = () => {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-6 pt-12 max-w-2xl mx-auto">
-              <div className="text-center">
+            <div className={`grid grid-cols-3 gap-6 pt-12 max-w-2xl mx-auto transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+              <div className="text-center animate-float">
                 <div className="text-3xl font-bold text-primary mb-1">10K+</div>
                 <div className="text-sm text-muted-foreground">การวิเคราะห์</div>
               </div>
-              <div className="text-center">
+              <div className="text-center animate-float" style={{ animationDelay: '0.5s' }}>
                 <div className="text-3xl font-bold text-primary mb-1">98%</div>
                 <div className="text-sm text-muted-foreground">ความแม่นยำ</div>
               </div>
-              <div className="text-center">
+              <div className="text-center animate-float" style={{ animationDelay: '1s' }}>
                 <div className="text-3xl font-bold text-primary mb-1">5K+</div>
                 <div className="text-sm text-muted-foreground">ผู้ใช้งาน</div>
               </div>
@@ -647,7 +672,7 @@ const Index = () => {
         {/* Features Section */}
         {!uploadedImageUrl && !analysis && (
           <div className="mb-16">
-            <div className="text-center mb-10">
+            <div className={`text-center mb-10 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
               <h2 className="text-3xl font-bold text-foreground mb-3">
                 คุณสมบัติเด่น
               </h2>
@@ -657,7 +682,11 @@ const Index = () => {
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-              <Card className="glass-card shadow-card hover:shadow-elegant transition-all cursor-pointer group" onClick={() => navigate("/")}>
+              <Card 
+                className={`glass-card shadow-card hover:shadow-elegant transition-all cursor-pointer group ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}
+                style={{ animationDelay: '0.1s' }}
+                onClick={() => navigate("/")}
+              >
                 <div className="p-6 text-center">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <Sparkles className="w-8 h-8 text-primary" />
@@ -667,7 +696,11 @@ const Index = () => {
                 </div>
               </Card>
 
-              <Card className="glass-card shadow-card hover:shadow-elegant transition-all cursor-pointer group" onClick={() => navigate("/skin-analysis")}>
+              <Card 
+                className={`glass-card shadow-card hover:shadow-elegant transition-all cursor-pointer group ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}
+                style={{ animationDelay: '0.2s' }}
+                onClick={() => navigate("/skin-analysis")}
+              >
                 <div className="p-6 text-center">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-secondary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <Sparkles className="w-8 h-8 text-secondary" />
@@ -677,7 +710,11 @@ const Index = () => {
                 </div>
               </Card>
 
-              <Card className="glass-card shadow-card hover:shadow-elegant transition-all cursor-pointer group" onClick={() => navigate("/age-progression")}>
+              <Card 
+                className={`glass-card shadow-card hover:shadow-elegant transition-all cursor-pointer group ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}
+                style={{ animationDelay: '0.3s' }}
+                onClick={() => navigate("/age-progression")}
+              >
                 <div className="p-6 text-center">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-accent flex items-center justify-center group-hover:scale-110 transition-transform">
                     <Clock className="w-8 h-8 text-foreground" />
@@ -687,7 +724,11 @@ const Index = () => {
                 </div>
               </Card>
 
-              <Card className="glass-card shadow-card hover:shadow-elegant transition-all cursor-pointer group" onClick={() => navigate("/consultation")}>
+              <Card 
+                className={`glass-card shadow-card hover:shadow-elegant transition-all cursor-pointer group ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}
+                style={{ animationDelay: '0.4s' }}
+                onClick={() => navigate("/consultation")}
+              >
                 <div className="p-6 text-center">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <MessageCircle className="w-8 h-8 text-primary" />
@@ -702,11 +743,11 @@ const Index = () => {
 
         {/* Start Analysis Section (only show when no image uploaded) */}
         {!uploadedImageUrl && !analysis && (
-          <div className="mb-16">
-            <Card className="glass-card shadow-elegant border-2 border-primary/20">
+          <div className={`mb-16 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`} style={{ transitionDelay: '0.6s' }}>
+            <Card className="glass-card shadow-elegant border-2 border-primary/20 overflow-hidden">
               <div className="bg-gradient-to-r from-primary to-primary/80 px-6 py-5">
                 <h2 className="text-white font-bold text-2xl flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center animate-pulse">
                     <Sparkles className="w-6 h-6" />
                   </div>
                   เริ่มต้นวิเคราะห์ใบหน้า
@@ -720,13 +761,14 @@ const Index = () => {
                   <div 
                     className="group relative overflow-hidden border-2 border-primary/30 rounded-2xl p-8 text-center 
                                hover:border-primary hover:bg-accent/50 transition-all cursor-pointer 
-                               hover:scale-105 active:scale-95"
+                               hover:scale-105 active:scale-95 animate-scale-in"
+                    style={{ animationDelay: '0.8s' }}
                     onClick={handleOpenFaceScanner}
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     <div className="relative">
                       <div className="w-20 h-20 mx-auto mb-5 rounded-2xl bg-primary 
-                                    flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                                    flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg group-hover:shadow-glow">
                         <Camera className="w-10 h-10 text-white" />
                       </div>
                       <h4 className="text-foreground font-bold text-xl mb-3">
@@ -756,7 +798,8 @@ const Index = () => {
                   <label htmlFor="file-upload-choice" className="cursor-pointer">
                     <div className="group relative overflow-hidden border-2 border-secondary/50 rounded-2xl p-8 text-center 
                                    hover:border-secondary hover:bg-accent/50 transition-all 
-                                   hover:scale-105 active:scale-95 h-full">
+                                   hover:scale-105 active:scale-95 h-full animate-scale-in"
+                         style={{ animationDelay: '0.9s' }}>
                       <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                       <div className="relative">
                         <div className="w-20 h-20 mx-auto mb-5 rounded-2xl bg-secondary 
@@ -790,7 +833,7 @@ const Index = () => {
                 </div>
 
                 {/* Help Text */}
-                <div className="mt-6 p-4 bg-accent rounded-xl border border-border">
+                <div className="mt-6 p-4 bg-accent rounded-xl border border-border animate-fade-in" style={{ animationDelay: '1s' }}>
                   <div className="flex items-start gap-3">
                     <Info className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                     <div>
