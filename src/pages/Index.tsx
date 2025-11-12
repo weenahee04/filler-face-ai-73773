@@ -12,6 +12,8 @@ import html2canvas from "html2canvas";
 import { ResultImage } from "@/components/ResultImage";
 import { FaceScanner } from "@/components/FaceScanner";
 import { Header } from "@/components/Header";
+import { checkBrowserCompatibility, getRecommendedBrowsers, isMobileDevice } from "@/lib/browser-compatibility";
+import { AlertCircle } from "lucide-react";
 const Index = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string>('');
@@ -23,6 +25,7 @@ const Index = () => {
   const [generatingImage, setGeneratingImage] = useState(false);
   const [showFaceScanner, setShowFaceScanner] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
+  const [showCompatibilityWarning, setShowCompatibilityWarning] = useState(false);
   const resultImageRef = useRef<HTMLDivElement>(null);
   const {
     toast
@@ -317,6 +320,27 @@ const Index = () => {
   const openProfile = () => {
     navigate(`/profile/${analysisId}`);
   };
+
+  const handleOpenFaceScanner = () => {
+    const compatibility = checkBrowserCompatibility();
+    
+    if (!compatibility.isCompatible) {
+      console.log('Browser compatibility check failed:', compatibility);
+      setShowCompatibilityWarning(true);
+      
+      toast({
+        title: "⚠️ เบราว์เซอร์ไม่รองรับการสแกนใบหน้า",
+        description: `ฟีเจอร์บางอย่างไม่พร้อมใช้งาน: ${compatibility.missingFeatures.join(", ")}`,
+        variant: "destructive",
+        duration: 8000
+      });
+      
+      return;
+    }
+    
+    console.log('Browser compatibility check passed:', compatibility);
+    setShowFaceScanner(true);
+  };
   return <div className="min-h-screen mint-gradient-bg">
       <Header />
       
@@ -366,6 +390,61 @@ const Index = () => {
             <Button onClick={handleConsentAccept} className="w-full sm:w-auto bg-primary hover:bg-primary-hover font-semibold">
               <CheckCircle2 className="w-4 h-4 mr-2" />
               ยอมรับและดำเนินการต่อ
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Compatibility Warning Dialog */}
+      <Dialog open={showCompatibilityWarning} onOpenChange={setShowCompatibilityWarning}>
+        <DialogContent className="sm:max-w-[500px] glass-card">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-foreground flex items-center gap-2">
+              <AlertCircle className="w-6 h-6 text-destructive" />
+              เบราว์เซอร์ไม่รองรับการสแกนใบหน้า
+            </DialogTitle>
+            <DialogDescription className="text-base text-muted-foreground space-y-4 pt-4">
+              <div className="p-4 bg-destructive/10 rounded-xl border border-destructive/20">
+                <p className="text-sm text-foreground font-semibold mb-2">
+                  📱 {isMobileDevice() ? "อุปกรณ์มือถือของคุณ" : "เบราว์เซอร์ของคุณ"}ไม่รองรับฟีเจอร์บางอย่างที่จำเป็น
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  กรุณาลองใช้เบราว์เซอร์ที่แนะนำด้านล่าง หรือใช้วิธีอัพโหลดรูปภาพแทน
+                </p>
+              </div>
+              
+              <div className="p-4 bg-accent rounded-xl border border-border">
+                <h4 className="font-bold text-foreground mb-2 flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-primary" />
+                  เบราว์เซอร์ที่แนะนำ
+                </h4>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  {getRecommendedBrowsers().map((browser, index) => (
+                    <li key={index} className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      <span>{browser}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="p-4 bg-primary/10 rounded-xl border border-primary/20">
+                <p className="text-sm font-semibold text-foreground mb-1">
+                  💡 ทางเลือกอื่น
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  คุณสามารถใช้ฟีเจอร์ <span className="font-semibold text-foreground">"อัพโหลดรูปภาพ"</span> ได้ทันที โดยไม่ต้องเปลี่ยนเบราว์เซอร์
+                </p>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              onClick={() => setShowCompatibilityWarning(false)}
+              className="w-full sm:w-auto bg-primary hover:bg-primary-hover font-semibold"
+            >
+              <CheckCircle2 className="w-4 h-4 mr-2" />
+              เข้าใจแล้ว
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -461,7 +540,7 @@ const Index = () => {
               {/* Face Scan Option */}
               <div className="group border-2 border-primary/30 rounded-2xl p-6 text-center 
                          hover:border-primary hover:bg-accent transition-all cursor-pointer 
-                         hover:scale-105 active:scale-95" onClick={() => setShowFaceScanner(true)}>
+                         hover:scale-105 active:scale-95" onClick={handleOpenFaceScanner}>
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary 
                               flex items-center justify-center group-hover:scale-110 transition-transform">
                   <Camera className="w-8 h-8 text-white" />
