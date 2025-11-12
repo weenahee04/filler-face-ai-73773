@@ -18,17 +18,13 @@ export const SimpleFaceScanner = ({ onCapture, onClose }: SimpleFaceScannerProps
   // Start camera
   useEffect(() => {
     let mounted = true;
+    let currentStream: MediaStream | null = null;
     
     const startCamera = async () => {
       console.log('Starting camera...');
       setIsLoading(true);
       
       try {
-        // Stop existing stream if any
-        if (stream) {
-          stream.getTracks().forEach(track => track.stop());
-        }
-
         console.log('Requesting camera access with facing mode:', facingMode);
         const mediaStream = await navigator.mediaDevices.getUserMedia({
           video: { 
@@ -44,13 +40,17 @@ export const SimpleFaceScanner = ({ onCapture, onClose }: SimpleFaceScannerProps
         }
 
         console.log('Camera access granted');
+        currentStream = mediaStream;
         setStream(mediaStream);
         
         if (videoRef.current) {
           videoRef.current.srcObject = mediaStream;
           videoRef.current.onloadedmetadata = () => {
+            if (!mounted) return;
             console.log('Video metadata loaded, starting playback');
-            videoRef.current?.play();
+            videoRef.current?.play().catch(err => {
+              console.error('Error playing video:', err);
+            });
             setIsLoading(false);
           };
         }
@@ -87,7 +87,9 @@ export const SimpleFaceScanner = ({ onCapture, onClose }: SimpleFaceScannerProps
         
         // Close after showing error
         setTimeout(() => {
-          onClose();
+          if (mounted) {
+            onClose();
+          }
         }, 3000);
       }
     };
@@ -96,12 +98,12 @@ export const SimpleFaceScanner = ({ onCapture, onClose }: SimpleFaceScannerProps
 
     return () => {
       mounted = false;
-      if (stream) {
-        console.log('Cleaning up camera stream');
-        stream.getTracks().forEach(track => track.stop());
+      console.log('Cleaning up camera stream');
+      if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
       }
     };
-  }, [facingMode, toast, onClose]);
+  }, [facingMode]); // Only re-run when facingMode changes
 
   const capturePhoto = () => {
     if (!videoRef.current) return;
