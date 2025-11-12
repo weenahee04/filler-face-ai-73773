@@ -142,56 +142,56 @@ export const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-4">
+          <nav className="hidden lg:flex items-center gap-2 xl:gap-3">
             <Button 
               variant="ghost"
               onClick={() => navigate("/forum")}
-              className="text-sm font-medium"
+              className="text-sm font-medium px-3"
             >
-              <Users className="w-4 h-4 mr-2" />
-              Forum
+              <Users className="w-4 h-4 lg:mr-2" />
+              <span className="hidden xl:inline">Forum</span>
             </Button>
 
             <Button 
               variant="ghost"
               onClick={() => navigate("/consultation")}
-              className="text-sm font-medium"
+              className="text-sm font-medium px-3"
             >
-              <MessageCircle className="w-4 h-4 mr-2" />
-              ปรึกษา AI
+              <MessageCircle className="w-4 h-4 lg:mr-2" />
+              <span className="hidden xl:inline">ปรึกษา AI</span>
             </Button>
 
             <Button 
               variant="ghost"
               onClick={() => navigate("/age-progression")}
-              className="text-sm font-medium"
+              className="text-sm font-medium px-3"
             >
-              <Clock className="w-4 h-4 mr-2" />
-              ดูหน้าในอนาคต
+              <Clock className="w-4 h-4 lg:mr-2" />
+              <span className="hidden xl:inline">ดูหน้าในอนาคต</span>
             </Button>
 
             <Button 
               variant="ghost"
               onClick={() => navigate("/skin-analysis")}
-              className="text-sm font-medium"
+              className="text-sm font-medium px-3"
             >
-              <Sparkles className="w-4 h-4 mr-2" />
-              วิเคราะห์ผิวหน้า
+              <Sparkles className="w-4 h-4 lg:mr-2" />
+              <span className="hidden xl:inline">วิเคราะห์ผิวหน้า</span>
             </Button>
             
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="gap-2">
+                  <Button variant="outline" className="gap-2 ml-2">
                     <Avatar className="h-6 w-6">
                       <AvatarFallback className="text-xs bg-primary text-primary-foreground">
                         {getUserInitials()}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="font-medium">{getUserDisplayName()}</span>
+                    <span className="font-medium hidden xl:inline">{getUserDisplayName()}</span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 bg-card z-50">
+                <DropdownMenuContent align="end" className="w-48 bg-card border border-border shadow-lg z-50">
                   <DropdownMenuLabel>บัญชีของฉัน</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={openEditDialog}>
@@ -209,7 +209,7 @@ export const Header = () => {
               <Button 
                 variant="outline"
                 onClick={() => navigate("/auth")}
-                className="text-sm font-medium"
+                className="text-sm font-medium ml-2"
               >
                 เข้าสู่ระบบ
               </Button>
@@ -218,7 +218,7 @@ export const Header = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2"
+            className="lg:hidden p-2"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             <Menu className="w-6 h-6 text-foreground" />
@@ -227,7 +227,7 @@ export const Header = () => {
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <nav className="md:hidden py-4 border-t border-border">
+          <nav className="lg:hidden py-4 border-t border-border">
             <div className="flex flex-col gap-4">
               {user && (
                 <div className="flex items-center gap-3 px-3 py-2 bg-accent rounded-lg">
