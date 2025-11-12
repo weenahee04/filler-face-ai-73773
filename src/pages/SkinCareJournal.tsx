@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -8,11 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Header } from "@/components/Header";
-import { Calendar, Camera, X, Plus, Trash2, Edit2, BookOpen } from "lucide-react";
+import { Calendar, Camera, X, Plus, Trash2, Edit2, BookOpen, TrendingUp, BarChart3, PieChart, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { format } from "date-fns";
+import { format, subDays, startOfDay } from "date-fns";
 import { th } from "date-fns/locale";
+import { LineChart, Line, BarChart, Bar, PieChart as RechartsPie, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 interface JournalEntry {
   id: string;
@@ -41,6 +42,15 @@ const MOODS = [
   { value: "bad", label: "แย่", emoji: "😔" },
 ];
 
+const CHART_COLORS = [
+  "#8B5CF6", // primary
+  "#10B981", // green
+  "#F59E0B", // orange
+  "#EF4444", // red
+  "#3B82F6", // blue
+  "#EC4899", // pink
+];
+
 const SkinCareJournal = () => {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,6 +70,92 @@ const SkinCareJournal = () => {
 
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Calculate statistics
+  const statistics = useMemo(() => {
+    if (entries.length === 0) return null;
+
+    // Skin condition trends over last 30 days
+    const last30Days = subDays(new Date(), 30);
+    const recentEntries = entries.filter(
+      entry => new Date(entry.journal_date) >= last30Days
+    );
+
+    // Group by date and count acne occurrences
+    const skinTrends = recentEntries.reduce((acc, entry) => {
+      const date = format(new Date(entry.journal_date), "dd/MM");
+      const hasAcne = entry.skin_conditions.includes("acne");
+      const hasDry = entry.skin_conditions.includes("dry");
+      const hasOily = entry.skin_conditions.includes("oily");
+      
+      acc.push({
+        date,
+        สิว: hasAcne ? 1 : 0,
+        ผิวแห้ง: hasDry ? 1 : 0,
+        ผิวมัน: hasOily ? 1 : 0,
+      });
+      
+      return acc;
+    }, [] as any[]).reverse();
+
+    // Product frequency
+    const productCount: { [key: string]: number } = {};
+    entries.forEach(entry => {
+      entry.products_used.forEach(product => {
+        productCount[product] = (productCount[product] || 0) + 1;
+      });
+    });
+
+    const topProducts = Object.entries(productCount)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 10)
+      .map(([name, count]) => ({ name, ความถี่: count }));
+
+    // Mood distribution
+    const moodCount: { [key: string]: number } = {
+      great: 0,
+      good: 0,
+      okay: 0,
+      bad: 0,
+    };
+    entries.forEach(entry => {
+      if (entry.mood && moodCount[entry.mood] !== undefined) {
+        moodCount[entry.mood]++;
+      }
+    });
+
+    const moodData = Object.entries(moodCount)
+      .filter(([, count]) => count > 0)
+      .map(([mood, count]) => ({
+        name: MOODS.find(m => m.value === mood)?.label || mood,
+        value: count,
+      }));
+
+    // Skin condition summary
+    const conditionCount: { [key: string]: number } = {};
+    entries.forEach(entry => {
+      entry.skin_conditions.forEach(condition => {
+        conditionCount[condition] = (conditionCount[condition] || 0) + 1;
+      });
+    });
+
+    const topConditions = Object.entries(conditionCount)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 6)
+      .map(([condition, count]) => ({
+        name: SKIN_CONDITIONS.find(c => c.value === condition)?.label || condition,
+        ความถี่: count,
+      }));
+
+    return {
+      skinTrends,
+      topProducts,
+      moodData,
+      topConditions,
+      totalEntries: entries.length,
+      totalProducts: Object.keys(productCount).length,
+    };
+  }, [entries]);
 
   useEffect(() => {
     checkAuth();
@@ -446,6 +542,247 @@ const SkinCareJournal = () => {
             </Dialog>
           </div>
         </div>
+
+        {/* Statistics Section */}
+        {statistics && entries.length > 0 && (
+          <div className="mb-8 space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-foreground mb-2">สถิติการดูแลผิว</h2>
+              <p className="text-muted-foreground">ข้อมูลสรุปจากการบันทึกของคุณ</p>
+            </div>
+
+            {/* Summary Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card className="glass-card">
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <BookOpen className="w-8 h-8 mx-auto mb-2 text-primary" />
+                    <div className="text-3xl font-bold text-foreground">{statistics.totalEntries}</div>
+                    <p className="text-sm text-muted-foreground">รายการบันทึก</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="glass-card">
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <Sparkles className="w-8 h-8 mx-auto mb-2 text-secondary" />
+                    <div className="text-3xl font-bold text-foreground">{statistics.totalProducts}</div>
+                    <p className="text-sm text-muted-foreground">ผลิตภัณฑ์ทั้งหมด</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="glass-card">
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <TrendingUp className="w-8 h-8 mx-auto mb-2 text-green-500" />
+                    <div className="text-3xl font-bold text-foreground">
+                      {statistics.skinTrends.length}
+                    </div>
+                    <p className="text-sm text-muted-foreground">วันที่บันทึก (30 วัน)</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="glass-card">
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    {statistics.moodData[0] && (
+                      <>
+                        <div className="text-4xl mb-2">
+                          {MOODS.find(m => m.label === statistics.moodData[0].name)?.emoji}
+                        </div>
+                        <div className="text-lg font-bold text-foreground">
+                          {statistics.moodData[0].name}
+                        </div>
+                        <p className="text-sm text-muted-foreground">อารมณ์ส่วนใหญ่</p>
+                      </>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Charts */}
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Skin Condition Trends */}
+              {statistics.skinTrends.length > 0 && (
+                <Card className="glass-card">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-primary" />
+                      แนวโน้มอาการผิวหน้า (30 วันล่าสุด)
+                    </CardTitle>
+                    <CardDescription>ติดตามการเปลี่ยนแปลงของผิวหน้า</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={statistics.skinTrends}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                        <XAxis 
+                          dataKey="date" 
+                          stroke="hsl(var(--foreground))"
+                          style={{ fontSize: '12px' }}
+                        />
+                        <YAxis 
+                          stroke="hsl(var(--foreground))"
+                          style={{ fontSize: '12px' }}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "hsl(var(--card))",
+                            border: "1px solid hsl(var(--border))",
+                            borderRadius: "8px",
+                          }}
+                        />
+                        <Legend />
+                        <Line 
+                          type="monotone" 
+                          dataKey="สิว" 
+                          stroke="#EF4444" 
+                          strokeWidth={2}
+                          dot={{ fill: "#EF4444" }}
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="ผิวแห้ง" 
+                          stroke="#F59E0B" 
+                          strokeWidth={2}
+                          dot={{ fill: "#F59E0B" }}
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="ผิวมัน" 
+                          stroke="#10B981" 
+                          strokeWidth={2}
+                          dot={{ fill: "#10B981" }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Top Products */}
+              {statistics.topProducts.length > 0 && (
+                <Card className="glass-card">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BarChart3 className="w-5 h-5 text-secondary" />
+                      ผลิตภัณฑ์ที่ใช้บ่อยที่สุด
+                    </CardTitle>
+                    <CardDescription>10 อันดับแรก</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={statistics.topProducts} layout="horizontal">
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                        <XAxis 
+                          type="number"
+                          stroke="hsl(var(--foreground))"
+                          style={{ fontSize: '12px' }}
+                        />
+                        <YAxis 
+                          type="category"
+                          dataKey="name" 
+                          width={100}
+                          stroke="hsl(var(--foreground))"
+                          style={{ fontSize: '11px' }}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "hsl(var(--card))",
+                            border: "1px solid hsl(var(--border))",
+                            borderRadius: "8px",
+                          }}
+                        />
+                        <Bar dataKey="ความถี่" fill="#8B5CF6" radius={[0, 8, 8, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Mood Distribution */}
+              {statistics.moodData.length > 0 && (
+                <Card className="glass-card">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <PieChart className="w-5 h-5 text-green-500" />
+                      การกระจายอารมณ์
+                    </CardTitle>
+                    <CardDescription>สัดส่วนอารมณ์ทั้งหมด</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <RechartsPie>
+                        <Pie
+                          data={statistics.moodData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          outerRadius={100}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {statistics.moodData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "hsl(var(--card))",
+                            border: "1px solid hsl(var(--border))",
+                            borderRadius: "8px",
+                          }}
+                        />
+                      </RechartsPie>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Top Skin Conditions */}
+              {statistics.topConditions.length > 0 && (
+                <Card className="glass-card">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BarChart3 className="w-5 h-5 text-orange-500" />
+                      อาการผิวที่พบบ่อย
+                    </CardTitle>
+                    <CardDescription>อาการที่พบเจอบ่อยที่สุด</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={statistics.topConditions}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                        <XAxis 
+                          dataKey="name"
+                          stroke="hsl(var(--foreground))"
+                          style={{ fontSize: '12px' }}
+                        />
+                        <YAxis 
+                          stroke="hsl(var(--foreground))"
+                          style={{ fontSize: '12px' }}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "hsl(var(--card))",
+                            border: "1px solid hsl(var(--border))",
+                            borderRadius: "8px",
+                          }}
+                        />
+                        <Bar dataKey="ความถี่" fill="#F59E0B" radius={[8, 8, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Entries List */}
         {loading ? (
