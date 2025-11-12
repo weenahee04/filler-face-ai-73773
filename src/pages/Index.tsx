@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Camera, Upload, Loader2, Sparkles, CheckCircle2, ExternalLink, Download, Share2, Info, ArrowRight, TrendingUp, MessageCircle, Eye, ThumbsUp } from "lucide-react";
+import { Camera, Upload, Loader2, Sparkles, CheckCircle2, ExternalLink, Download, Share2, Info, ArrowRight, TrendingUp, MessageCircle, Eye, ThumbsUp, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -582,87 +582,230 @@ const Index = () => {
         </DialogContent>
       </Dialog>
 
-      <div className="container mx-auto px-4 py-6 max-w-6xl pt-24">
-        {/* Info Badge */}
-        <div className="mb-6 flex justify-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 glass-card rounded-full shadow-soft border border-border">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-foreground">
-              AI วิเคราะห์ใบหน้าอัจฉริยะ
-            </span>
-          </div>
-        </div>
-
-        {/* How to Use Card */}
-        <Card className="mb-6 glass-card shadow-card overflow-hidden cursor-pointer hover:shadow-elegant transition-all hover:scale-[1.02]" onClick={() => navigate("/how-to-use")}>
-          <div className="bg-primary px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <Info className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h3 className="text-white font-bold text-base">วิธีการใช้งาน</h3>
-                <p className="text-white/90 text-xs">คู่มือใช้งานแบบละเอียด</p>
-              </div>
-            </div>
-            <ArrowRight className="w-5 h-5 text-white" />
-          </div>
-        </Card>
-
-        {/* Feature Selection (only show when no image uploaded) */}
-        {!uploadedImageUrl && !analysis && <div className="mb-6 p-6 glass-card rounded-2xl shadow-card">
-            <div className="text-center mb-4">
-              <h3 className="text-xl font-bold text-foreground mb-2">เริ่มต้นวิเคราะห์ใบหน้า</h3>
-              <p className="text-sm text-muted-foreground">เลือกวิธีการที่คุณต้องการ</p>
+      {/* Hero Section */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/5 border-b border-border">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        <div className="container mx-auto px-4 py-20 max-w-6xl relative">
+          <div className="text-center space-y-6 max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-2 glass-card rounded-full shadow-soft border border-border mb-4">
+              <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+              <span className="text-sm font-medium text-foreground">
+                AI-Powered Face Analysis
+              </span>
             </div>
             
-            <div className="grid md:grid-cols-2 gap-4">
-              {/* Face Scan Option */}
-              <div className="group border-2 border-primary/30 rounded-2xl p-6 text-center 
-                         hover:border-primary hover:bg-accent transition-all cursor-pointer 
-                         hover:scale-105 active:scale-95" onClick={handleOpenFaceScanner}>
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary 
-                              flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Camera className="w-8 h-8 text-white" />
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
+              วิเคราะห์ใบหน้าด้วย
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"> AI อัจฉริยะ</span>
+            </h1>
+            
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+              ค้นพบศักยภาพความงามของคุณด้วยเทคโนโลยี AI ที่ทันสมัยที่สุด 
+              วิเคราะห์ใบหน้าแบบละเอียด พร้อมคำแนะนำเฉพาะบุคคล
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+              <Button 
+                size="lg" 
+                className="bg-primary hover:bg-primary-hover text-white font-semibold shadow-elegant hover:shadow-glow transition-all hover:scale-105 text-base px-8 py-6"
+                onClick={handleOpenFaceScanner}
+              >
+                <Camera className="w-5 h-5 mr-2" />
+                เริ่มวิเคราะห์เลย
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="font-semibold text-base px-8 py-6"
+                onClick={() => navigate("/how-to-use")}
+              >
+                <Info className="w-5 h-5 mr-2" />
+                วิธีใช้งาน
+              </Button>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-6 pt-12 max-w-2xl mx-auto">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-primary mb-1">10K+</div>
+                <div className="text-sm text-muted-foreground">การวิเคราะห์</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-primary mb-1">98%</div>
+                <div className="text-sm text-muted-foreground">ความแม่นยำ</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-primary mb-1">5K+</div>
+                <div className="text-sm text-muted-foreground">ผู้ใช้งาน</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-12 max-w-6xl">
+        {/* Features Section */}
+        {!uploadedImageUrl && !analysis && (
+          <div className="mb-16">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-bold text-foreground mb-3">
+                คุณสมบัติเด่น
+              </h2>
+              <p className="text-muted-foreground text-lg">
+                ฟีเจอร์ที่จะช่วยให้คุณเข้าใจและดูแลผิวหน้าได้ดีขึ้น
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+              <Card className="glass-card shadow-card hover:shadow-elegant transition-all cursor-pointer group" onClick={() => navigate("/")}>
+                <div className="p-6 text-center">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Sparkles className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="font-bold text-foreground mb-2">วิเคราะห์ใบหน้า</h3>
+                  <p className="text-sm text-muted-foreground">วิเคราะห์ลักษณะใบหน้าแบบละเอียด</p>
                 </div>
-                <h4 className="text-foreground font-bold text-lg mb-2">
-                  ถ่ายภาพใบหน้า
-                </h4>
-                <p className="text-sm text-muted-foreground mb-3">
-                  เปิดกล้องและถ่ายภาพ
-                </p>
-                <div className="flex flex-col gap-1 text-xs text-muted-foreground">
-                  <span>✓ ง่ายและรวดเร็ว</span>
-                  <span>✓ ถ่ายภาพทันที</span>
-                  <span>✓ ได้ภาพคุณภาพสูง</span>
+              </Card>
+
+              <Card className="glass-card shadow-card hover:shadow-elegant transition-all cursor-pointer group" onClick={() => navigate("/skin-analysis")}>
+                <div className="p-6 text-center">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-secondary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Sparkles className="w-8 h-8 text-secondary" />
+                  </div>
+                  <h3 className="font-bold text-foreground mb-2">วิเคราะห์ผิวหน้า</h3>
+                  <p className="text-sm text-muted-foreground">ตรวจสอบสุขภาพผิวอย่างละเอียด</p>
+                </div>
+              </Card>
+
+              <Card className="glass-card shadow-card hover:shadow-elegant transition-all cursor-pointer group" onClick={() => navigate("/age-progression")}>
+                <div className="p-6 text-center">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-accent flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Clock className="w-8 h-8 text-foreground" />
+                  </div>
+                  <h3 className="font-bold text-foreground mb-2">ดูหน้าในอนาคต</h3>
+                  <p className="text-sm text-muted-foreground">ดูว่าคุณจะหน้าตาเป็นยังไง</p>
+                </div>
+              </Card>
+
+              <Card className="glass-card shadow-card hover:shadow-elegant transition-all cursor-pointer group" onClick={() => navigate("/consultation")}>
+                <div className="p-6 text-center">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <MessageCircle className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="font-bold text-foreground mb-2">ปรึกษา AI</h3>
+                  <p className="text-sm text-muted-foreground">ถามคำถามเกี่ยวกับความงาม</p>
+                </div>
+              </Card>
+            </div>
+          </div>
+        )}
+
+        {/* Start Analysis Section (only show when no image uploaded) */}
+        {!uploadedImageUrl && !analysis && (
+          <div className="mb-16">
+            <Card className="glass-card shadow-elegant border-2 border-primary/20">
+              <div className="bg-gradient-to-r from-primary to-primary/80 px-6 py-5">
+                <h2 className="text-white font-bold text-2xl flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <Sparkles className="w-6 h-6" />
+                  </div>
+                  เริ่มต้นวิเคราะห์ใบหน้า
+                </h2>
+                <p className="text-white/90 text-sm mt-1 ml-13">เลือกวิธีการที่คุณต้องการ</p>
+              </div>
+              
+              <div className="p-8">
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Face Scan Option */}
+                  <div 
+                    className="group relative overflow-hidden border-2 border-primary/30 rounded-2xl p-8 text-center 
+                               hover:border-primary hover:bg-accent/50 transition-all cursor-pointer 
+                               hover:scale-105 active:scale-95"
+                    onClick={handleOpenFaceScanner}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="relative">
+                      <div className="w-20 h-20 mx-auto mb-5 rounded-2xl bg-primary 
+                                    flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                        <Camera className="w-10 h-10 text-white" />
+                      </div>
+                      <h4 className="text-foreground font-bold text-xl mb-3">
+                        ถ่ายภาพใบหน้า
+                      </h4>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        เปิดกล้องและถ่ายภาพใบหน้าของคุณ
+                      </p>
+                      <div className="flex flex-col gap-2 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2 justify-center">
+                          <CheckCircle2 className="w-4 h-4 text-primary" />
+                          <span>ง่ายและรวดเร็ว</span>
+                        </div>
+                        <div className="flex items-center gap-2 justify-center">
+                          <CheckCircle2 className="w-4 h-4 text-primary" />
+                          <span>ถ่ายภาพทันที</span>
+                        </div>
+                        <div className="flex items-center gap-2 justify-center">
+                          <CheckCircle2 className="w-4 h-4 text-primary" />
+                          <span>ได้ภาพคุณภาพสูง</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Upload Option */}
+                  <label htmlFor="file-upload-choice" className="cursor-pointer">
+                    <div className="group relative overflow-hidden border-2 border-secondary/50 rounded-2xl p-8 text-center 
+                                   hover:border-secondary hover:bg-accent/50 transition-all 
+                                   hover:scale-105 active:scale-95 h-full">
+                      <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                      <div className="relative">
+                        <div className="w-20 h-20 mx-auto mb-5 rounded-2xl bg-secondary 
+                                      flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                          <Upload className="w-10 h-10 text-secondary-foreground" />
+                        </div>
+                        <h4 className="text-foreground font-bold text-xl mb-3">
+                          อัพโหลดรูปภาพ
+                        </h4>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          เลือกรูปภาพจากแกลเลอรีของคุณ
+                        </p>
+                        <div className="flex flex-col gap-2 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-2 justify-center">
+                            <CheckCircle2 className="w-4 h-4 text-secondary" />
+                            <span>ใช้รูปที่มีอยู่แล้ว</span>
+                          </div>
+                          <div className="flex items-center gap-2 justify-center">
+                            <CheckCircle2 className="w-4 h-4 text-secondary" />
+                            <span>รองรับทุกรูปแบบ</span>
+                          </div>
+                          <div className="flex items-center gap-2 justify-center">
+                            <CheckCircle2 className="w-4 h-4 text-secondary" />
+                            <span>เลือกรูปที่ชอบ</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <input id="file-upload-choice" type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+                  </label>
+                </div>
+
+                {/* Help Text */}
+                <div className="mt-6 p-4 bg-accent rounded-xl border border-border">
+                  <div className="flex items-start gap-3">
+                    <Info className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-foreground mb-1">เคล็ดลับการถ่ายภาพ</p>
+                      <p className="text-xs text-muted-foreground">
+                        ถ่ายภาพในที่มีแสงสว่างเพียงพอ หันหน้าตรงกล้อง และอยู่ในระยะที่เหมาะสม 
+                        เพื่อผลลัพธ์ที่แม่นยำที่สุด
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
-
-              {/* Upload Option */}
-              <label htmlFor="file-upload-choice" className="cursor-pointer">
-                <div className="group border-2 border-secondary/50 rounded-2xl p-6 text-center 
-                             hover:border-secondary hover:bg-accent transition-all 
-                             hover:scale-105 active:scale-95 h-full">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-secondary 
-                                flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Upload className="w-8 h-8 text-secondary-foreground" />
-                  </div>
-                  <h4 className="text-foreground font-bold text-lg mb-2">
-                    อัพโหลดรูปภาพ
-                  </h4>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    เลือกรูปจากแกลเลอรี
-                  </p>
-                  <div className="flex flex-col gap-1 text-xs text-muted-foreground">
-                    <span>✓ ใช้รูปที่มีอยู่แล้ว</span>
-                    <span>✓ รองรับทุกรูปแบบ</span>
-                    <span>✓ เลือกรูปที่ชอบ</span>
-                  </div>
-                </div>
-                <input id="file-upload-choice" type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
-              </label>
-            </div>
-          </div>}
+            </Card>
+          </div>
+        )}
 
         {/* Image Preview & Analysis Section (only show when image is uploaded) */}
         {uploadedImageUrl && <Card className="mb-6 glass-card shadow-card overflow-hidden">

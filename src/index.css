@@ -142,4 +142,15 @@
   .hero-section {
     background: linear-gradient(180deg, hsl(330 60% 96%) 0%, hsl(0 0% 100%) 50%);
   }
+
+  .bg-grid-pattern {
+    background-image: 
+      linear-gradient(to right, hsl(0 0% 90%) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(0 0% 90%) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .mint-gradient-bg {
+    background: linear-gradient(180deg, hsl(330 60% 96%) 0%, hsl(0 0% 100%) 100%);
+  }
 }
