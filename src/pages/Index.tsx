@@ -1,8 +1,8 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Camera, Upload, Loader2, Sparkles, CheckCircle2, ExternalLink, Download, Share2, Info, ArrowRight } from "lucide-react";
+import { Camera, Upload, Loader2, Sparkles, CheckCircle2, ExternalLink, Download, Share2, Info, ArrowRight, TrendingUp, MessageCircle, Eye, ThumbsUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,6 +14,23 @@ import { SimpleFaceScanner } from "@/components/SimpleFaceScanner";
 import { Header } from "@/components/Header";
 import { checkBrowserCompatibility, getRecommendedBrowsers, isMobileDevice } from "@/lib/browser-compatibility";
 import { AlertCircle } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+interface ForumPost {
+  id: string;
+  title: string;
+  content: string;
+  created_at: string;
+  views_count: number;
+  user_id: string;
+  category_id: string;
+  image_url: string | null;
+  profiles: {
+    full_name: string | null;
+  } | null;
+  comments_count?: number;
+  likes_count?: number;
+}
+
 const Index = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string>('');
@@ -26,6 +43,9 @@ const Index = () => {
   const [showFaceScanner, setShowFaceScanner] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [showCompatibilityWarning, setShowCompatibilityWarning] = useState(false);
+  const [trendingPosts, setTrendingPosts] = useState<ForumPost[]>([]);
+  const [popularPosts, setPopularPosts] = useState<ForumPost[]>([]);
+  const [loadingPosts, setLoadingPosts] = useState(true);
   const resultImageRef = useRef<HTMLDivElement>(null);
   const {
     toast
@@ -348,6 +368,59 @@ const Index = () => {
     console.log('Opening camera...');
     setShowFaceScanner(true);
   };
+
+  // Load trending and popular posts
+  useEffect(() => {
+    const loadForumPosts = async () => {
+      try {
+        setLoadingPosts(true);
+
+        // Load trending posts (sorted by views)
+        const { data: trending, error: trendingError } = await supabase
+          .from("forum_posts")
+          .select(`
+            *,
+            profiles!forum_posts_user_id_fkey (full_name)
+          `)
+          .order("views_count", { ascending: false })
+          .limit(3);
+
+        if (trendingError) throw trendingError;
+
+        // Load popular posts (sorted by likes - need to count from forum_likes)
+        const { data: postsWithLikes, error: popularError } = await supabase
+          .from("forum_posts")
+          .select(`
+            *,
+            profiles!forum_posts_user_id_fkey (full_name),
+            forum_likes (count)
+          `)
+          .order("created_at", { ascending: false })
+          .limit(10);
+
+        if (popularError) throw popularError;
+
+        // Calculate likes count and sort
+        const postsWithCounts = postsWithLikes?.map(post => ({
+          ...post,
+          likes_count: post.forum_likes?.[0]?.count || 0
+        })) || [];
+
+        const sortedByLikes = postsWithCounts
+          .sort((a, b) => (b.likes_count || 0) - (a.likes_count || 0))
+          .slice(0, 3);
+
+        setTrendingPosts(trending || []);
+        setPopularPosts(sortedByLikes);
+      } catch (error) {
+        console.error("Error loading forum posts:", error);
+      } finally {
+        setLoadingPosts(false);
+      }
+    };
+
+    loadForumPosts();
+  }, []);
   return <div className="min-h-screen mint-gradient-bg">
       <Header />
       
@@ -862,6 +935,157 @@ const Index = () => {
                 </div>}
             </div>
           </Card>}
+
+        {/* Forum Section - Trending & Popular */}
+        <div className="mt-8 space-y-6">
+          {/* Trending Posts */}
+          <Card className="glass-card shadow-elegant">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-foreground">Trending Posts</h2>
+                    <p className="text-sm text-muted-foreground">โพสต์ยอดนิยมที่มีคนดูมากที่สุด</p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate("/forum")}
+                  className="gap-2"
+                >
+                  ดูทั้งหมด
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </div>
+
+              {loadingPosts ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="p-4 border border-border rounded-xl">
+                      <Skeleton className="h-6 w-3/4 mb-2" />
+                      <Skeleton className="h-4 w-full mb-4" />
+                      <div className="flex gap-4">
+                        <Skeleton className="h-4 w-20" />
+                        <Skeleton className="h-4 w-20" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : trendingPosts.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <MessageCircle className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                  <p>ยังไม่มีโพสต์</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {trendingPosts.map((post) => (
+                    <div
+                      key={post.id}
+                      onClick={() => navigate(`/forum/post/${post.id}`)}
+                      className="p-4 bg-background border border-border rounded-xl hover:border-primary/40 transition-all cursor-pointer group"
+                    >
+                      <h3 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-1">
+                        {post.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                        {post.content}
+                      </p>
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <Eye className="w-4 h-4" />
+                          <span>{post.views_count}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span>โดย {post.profiles?.full_name || "ไม่ระบุชื่อ"}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </Card>
+
+          {/* Popular Discussions */}
+          <Card className="glass-card shadow-elegant">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center">
+                    <ThumbsUp className="w-5 h-5 text-secondary" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-foreground">Popular Discussions</h2>
+                    <p className="text-sm text-muted-foreground">กระทู้ที่ได้รับความนิยมสูงสุด</p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate("/forum")}
+                  className="gap-2"
+                >
+                  ดูทั้งหมด
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </div>
+
+              {loadingPosts ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="p-4 border border-border rounded-xl">
+                      <Skeleton className="h-6 w-3/4 mb-2" />
+                      <Skeleton className="h-4 w-full mb-4" />
+                      <div className="flex gap-4">
+                        <Skeleton className="h-4 w-20" />
+                        <Skeleton className="h-4 w-20" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : popularPosts.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <ThumbsUp className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                  <p>ยังไม่มีกระทู้</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {popularPosts.map((post) => (
+                    <div
+                      key={post.id}
+                      onClick={() => navigate(`/forum/post/${post.id}`)}
+                      className="p-4 bg-background border border-border rounded-xl hover:border-primary/40 transition-all cursor-pointer group"
+                    >
+                      <h3 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-1">
+                        {post.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                        {post.content}
+                      </p>
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <ThumbsUp className="w-4 h-4" />
+                          <span>{post.likes_count || 0} ไลค์</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Eye className="w-4 h-4" />
+                          <span>{post.views_count}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span>โดย {post.profiles?.full_name || "ไม่ระบุชื่อ"}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </Card>
+        </div>
 
         {/* Singderm Brand Promotion Section */}
         <Card className="mt-6 glass-card shadow-elegant overflow-hidden">
