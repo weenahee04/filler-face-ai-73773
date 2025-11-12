@@ -213,8 +213,19 @@ export const SimpleFaceScanner = ({ onCapture, onClose }: SimpleFaceScannerProps
 
       {/* Camera View */}
       <div className="flex-1 relative bg-gradient-to-br from-muted/50 to-background overflow-hidden">
-        {isLoading ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+        {/* Video - always shown */}
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ transform: facingMode === "user" ? "scaleX(-1)" : "none" }}
+        />
+
+        {/* Loading Overlay */}
+        {isLoading && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-background/90 backdrop-blur-sm z-50">
             <div className="relative">
               <div className="w-20 h-20 rounded-full border-4 border-primary/30 border-t-primary animate-spin" />
               <div className="absolute inset-0 flex items-center justify-center">
@@ -226,18 +237,10 @@ export const SimpleFaceScanner = ({ onCapture, onClose }: SimpleFaceScannerProps
               <p className="text-muted-foreground text-sm">กรุณารอสักครู่...</p>
             </div>
           </div>
-        ) : (
-          <>
-            {/* Video */}
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{ transform: facingMode === "user" ? "scaleX(-1)" : "none" }}
-            />
+        )}
 
+        {!isLoading && (
+          <>
             {/* Face Guide Overlay */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div 
