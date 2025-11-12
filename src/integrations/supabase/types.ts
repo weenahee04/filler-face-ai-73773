@@ -14,7 +14,220 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      conversations: {
+        Row: {
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      customers: {
+        Row: {
+          birth_date: string | null
+          created_at: string | null
+          email: string | null
+          full_name: string
+          id: string
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          birth_date?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          birth_date?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      face_analyses: {
+        Row: {
+          analysis_result: Json
+          created_at: string | null
+          customer_id: string
+          estimated_cost: number | null
+          id: string
+          image_hash: string | null
+          image_url: string
+          recommendations: Json | null
+          treatment_areas: string[] | null
+        }
+        Insert: {
+          analysis_result: Json
+          created_at?: string | null
+          customer_id: string
+          estimated_cost?: number | null
+          id?: string
+          image_hash?: string | null
+          image_url: string
+          recommendations?: Json | null
+          treatment_areas?: string[] | null
+        }
+        Update: {
+          analysis_result?: Json
+          created_at?: string | null
+          customer_id?: string
+          estimated_cost?: number | null
+          id?: string
+          image_hash?: string | null
+          image_url?: string
+          recommendations?: Json | null
+          treatment_areas?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "face_analyses_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          image_url: string | null
+          role: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          role: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      treatment_history: {
+        Row: {
+          after_image_url: string | null
+          amount_used: string | null
+          before_image_url: string | null
+          cost: number | null
+          created_at: string | null
+          customer_id: string
+          face_analysis_id: string | null
+          id: string
+          notes: string | null
+          products_used: string[] | null
+          treatment_areas: string[]
+          treatment_date: string
+        }
+        Insert: {
+          after_image_url?: string | null
+          amount_used?: string | null
+          before_image_url?: string | null
+          cost?: number | null
+          created_at?: string | null
+          customer_id: string
+          face_analysis_id?: string | null
+          id?: string
+          notes?: string | null
+          products_used?: string[] | null
+          treatment_areas: string[]
+          treatment_date: string
+        }
+        Update: {
+          after_image_url?: string | null
+          amount_used?: string | null
+          before_image_url?: string | null
+          cost?: number | null
+          created_at?: string | null
+          customer_id?: string
+          face_analysis_id?: string | null
+          id?: string
+          notes?: string | null
+          products_used?: string[] | null
+          treatment_areas?: string[]
+          treatment_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treatment_history_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treatment_history_face_analysis_id_fkey"
+            columns: ["face_analysis_id"]
+            isOneToOne: false
+            referencedRelation: "face_analyses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

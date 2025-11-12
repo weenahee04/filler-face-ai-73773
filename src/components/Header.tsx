@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { Menu, MessageCircle } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
@@ -16,23 +17,21 @@ export const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
-            <Link 
-              to="/" 
-              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
-            >
-              AI TOOLS
-            </Link>
-            <Link 
-              to="/" 
-              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
-            >
-              PORTFOLIO
-            </Link>
+          <nav className="hidden md:flex items-center gap-4">
             <Button 
-              className="bg-primary hover:bg-primary-hover text-primary-foreground font-semibold rounded-full px-6"
+              variant="ghost"
+              onClick={() => navigate("/consultation")}
+              className="text-sm font-medium"
             >
-              LET'S TALK
+              <MessageCircle className="w-4 h-4 mr-2" />
+              ปรึกษา AI
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => navigate("/auth")}
+              className="text-sm font-medium"
+            >
+              เข้าสู่ระบบ
             </Button>
           </nav>
 
@@ -49,25 +48,26 @@ export const Header = () => {
         {mobileMenuOpen && (
           <nav className="md:hidden py-4 border-t border-border">
             <div className="flex flex-col gap-4">
-              <Link 
-                to="/" 
-                className="text-sm font-medium text-foreground hover:text-primary transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                AI TOOLS
-              </Link>
-              <Link 
-                to="/" 
-                className="text-sm font-medium text-foreground hover:text-primary transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                PORTFOLIO
-              </Link>
               <Button 
-                className="bg-primary hover:bg-primary-hover text-primary-foreground font-semibold rounded-full"
-                onClick={() => setMobileMenuOpen(false)}
+                variant="ghost"
+                onClick={() => {
+                  navigate("/consultation");
+                  setMobileMenuOpen(false);
+                }}
+                className="text-sm font-medium justify-start"
               >
-                LET'S TALK
+                <MessageCircle className="w-4 h-4 mr-2" />
+                ปรึกษา AI
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  navigate("/auth");
+                  setMobileMenuOpen(false);
+                }}
+                className="text-sm font-medium"
+              >
+                เข้าสู่ระบบ
               </Button>
             </div>
           </nav>

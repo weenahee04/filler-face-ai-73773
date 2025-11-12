@@ -1,1 +1,23 @@
 project_id = "hcishnsuywqyhjhabcxt"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+
+[db.pooler]
+enabled = false
+
+[functions.ai-consultation]
+verify_jwt = true
+
+[functions.analyze-face]
+verify_jwt = false
+
+[functions.generate-after-image]
+verify_jwt = false

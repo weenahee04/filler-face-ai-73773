@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Download, Share2, Loader2, Sparkles, CheckCircle2, ExternalLink, ArrowLeft } from "lucide-react";
+import { Download, Share2, Loader2, Sparkles, CheckCircle2, ExternalLink, ArrowLeft, MessageCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import html2canvas from "html2canvas";
 import { Header } from "@/components/Header";
@@ -344,7 +344,7 @@ const Result = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <Button 
               onClick={handleDownload} 
               disabled={generatingImage} 
@@ -379,6 +379,15 @@ const Result = () => {
                   แชร์ผลลัพธ์
                 </>
               )}
+            </Button>
+
+            <Button 
+              onClick={() => navigate("/consultation")} 
+              variant="outline"
+              className="font-bold h-14 text-base transition-all hover:scale-105 active:scale-95 border-2"
+            >
+              <MessageCircle className="w-5 h-5 mr-2" />
+              ปรึกษา AI เพิ่มเติม
             </Button>
           </div>
 

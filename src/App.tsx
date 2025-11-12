@@ -7,6 +7,8 @@ import Index from "./pages/Index";
 import Result from "./pages/Result";
 import HowToUse from "./pages/HowToUse";
 import Profile from "./pages/Profile";
+import Auth from "./pages/Auth";
+import Consultation from "./pages/Consultation";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +24,8 @@ const App = () => (
           <Route path="/result" element={<Result />} />
           <Route path="/how-to-use" element={<HowToUse />} />
           <Route path="/profile/:id" element={<Profile />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/consultation" element={<Consultation />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
