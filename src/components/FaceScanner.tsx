@@ -349,7 +349,7 @@ export const FaceScanner = ({ onCapture, onClose }: FaceScannerProps) => {
               onClick={capturePhoto}
               disabled={!faceDetected}
               size="lg"
-              className="w-full bg-gradient-to-r from-[#E91E8C] to-[#F06292] hover:opacity-90 font-bold text-base h-12 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-primary hover:bg-primary-hover font-bold text-base h-12 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Camera className="w-5 h-5 mr-2" />
               ถ่ายภาพ

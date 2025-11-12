@@ -316,51 +316,51 @@ const Index = () => {
   const openProfile = () => {
     navigate(`/profile/${analysisId}`);
   };
-  return <div className="min-h-screen bg-gradient-to-br from-white via-[#FFF0F5] to-[#FFE4F0] water-ripple-bg">
+  return <div className="min-h-screen mint-gradient-bg">
       {/* Face Scanner */}
       {showFaceScanner && <FaceScanner onCapture={handleFaceCapture} onClose={() => setShowFaceScanner(false)} />}
 
       {/* Consent Dialog */}
       <Dialog open={showConsent} onOpenChange={setShowConsent}>
-        <DialogContent className="sm:max-w-[500px] border-2 border-[#E91E8C]/20">
+        <DialogContent className="sm:max-w-[500px] glass-card">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-[#C2185B] flex items-center gap-2">
-              <Sparkles className="w-6 h-6 text-[#E91E8C]" />
+            <DialogTitle className="text-2xl font-bold text-foreground flex items-center gap-2">
+              <Sparkles className="w-6 h-6 text-primary" />
               เงื่อนไขการใช้งาน
             </DialogTitle>
-            <DialogDescription className="text-base text-gray-700 space-y-4 pt-4">
-              <div className="p-4 bg-gradient-to-r from-[#FFF0F5] to-[#FFE4F0] rounded-xl border border-[#E91E8C]/20">
-                <h4 className="font-bold text-[#C2185B] mb-2 flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5" />
+            <DialogDescription className="text-base text-muted-foreground space-y-4 pt-4">
+              <div className="p-4 bg-accent rounded-xl border border-border">
+                <h4 className="font-bold text-foreground mb-2 flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-primary" />
                   การประเมินเบื้องต้น
                 </h4>
-                <p className="text-sm text-gray-700">
+                <p className="text-sm text-muted-foreground">
                   ผลการวิเคราะห์จาก AI เป็นเพียงการประเมินเบื้องต้นเท่านั้น 
                   ควรปรึกษาแพทย์ผู้เชี่ยวชาญก่อนตัดสินใจทำหัตถการจริง
                 </p>
               </div>
               
-              <div className="p-4 bg-gradient-to-r from-[#FFF0F5] to-[#FFE4F0] rounded-xl border border-[#E91E8C]/20">
-                <h4 className="font-bold text-[#C2185B] mb-2 flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5" />
+              <div className="p-4 bg-accent rounded-xl border border-border">
+                <h4 className="font-bold text-foreground mb-2 flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-primary" />
                   ความเป็นส่วนตัว
                 </h4>
-                <p className="text-sm text-gray-700">
+                <p className="text-sm text-muted-foreground">
                   บริษัทจะไม่เก็บบันทึกหรือจัดเก็บข้อมูลรูปภาพของท่านไว้ในระบบ 
                   รูปภาพจะถูกใช้เพื่อการวิเคราะห์ชั่วคราวเท่านั้น
                 </p>
               </div>
 
-              <p className="text-sm text-gray-600 italic pt-2">
+              <p className="text-sm text-muted-foreground italic pt-2">
                 การกดปุ่ม "ยอมรับและดำเนินการต่อ" ถือว่าท่านได้อ่านและยอมรับเงื่อนไขข้างต้นแล้ว
               </p>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button variant="outline" onClick={() => setShowConsent(false)} className="w-full sm:w-auto border-2 border-gray-300">
+            <Button variant="outline" onClick={() => setShowConsent(false)} className="w-full sm:w-auto">
               ยกเลิก
             </Button>
-            <Button onClick={handleConsentAccept} className="w-full sm:w-auto bg-gradient-to-r from-[#E91E8C] to-[#F06292] hover:opacity-90 font-semibold">
+            <Button onClick={handleConsentAccept} className="w-full sm:w-auto bg-primary hover:bg-primary-hover font-semibold">
               <CheckCircle2 className="w-4 h-4 mr-2" />
               ยอมรับและดำเนินการต่อ
             </Button>
@@ -370,24 +370,24 @@ const Index = () => {
 
       {/* Share Link Dialog */}
       <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
-        <DialogContent className="sm:max-w-[500px] border-2 border-[#E91E8C]/20">
+        <DialogContent className="sm:max-w-[500px] glass-card">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-[#C2185B] flex items-center gap-2">
-              <Share2 className="w-6 h-6 text-[#E91E8C]" />
+            <DialogTitle className="text-2xl font-bold text-foreground flex items-center gap-2">
+              <Share2 className="w-6 h-6 text-primary" />
               แชร์ผลการวิเคราะห์
             </DialogTitle>
-            <DialogDescription className="text-base text-gray-700 pt-4">
+            <DialogDescription className="text-base text-muted-foreground pt-4">
               <div className="space-y-4">
-                <div className="p-4 bg-gradient-to-r from-[#FFF0F5] to-[#FFE4F0] rounded-xl border border-[#E91E8C]/20">
-                  <p className="text-sm font-semibold text-[#C2185B] mb-2">
+                <div className="p-4 bg-accent rounded-xl border border-border">
+                  <p className="text-sm font-semibold text-foreground mb-2">
                     ลิงก์โปรไฟล์การวิเคราะห์ของคุณ
                   </p>
-                  <div className="bg-white rounded-lg p-3 mb-3 border border-[#E91E8C]/20">
-                    <p className="text-xs text-gray-600 break-all font-mono">
+                  <div className="bg-background rounded-lg p-3 mb-3 border border-border">
+                    <p className="text-xs text-muted-foreground break-all font-mono">
                       {`${window.location.origin}/profile/${analysisId}`}
                     </p>
                   </div>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-muted-foreground">
                     คัดลอกลิงก์นี้เพื่อแชร์ผลการวิเคราะห์กับผู้อื่น หรือบันทึกไว้ดูภายหลัง
                   </p>
                 </div>
@@ -398,20 +398,20 @@ const Index = () => {
             <Button
               variant="outline"
               onClick={() => setShowShareDialog(false)}
-              className="w-full sm:w-auto border-2 border-gray-300"
+              className="w-full sm:w-auto"
             >
               ปิด
             </Button>
             <Button
               onClick={copyProfileLink}
-              className="w-full sm:w-auto bg-gradient-to-r from-[#E91E8C] to-[#F06292] hover:opacity-90 font-semibold"
+              className="w-full sm:w-auto bg-primary hover:bg-primary-hover font-semibold"
             >
               <Share2 className="w-4 h-4 mr-2" />
               คัดลอกลิงก์
             </Button>
             <Button
               onClick={openProfile}
-              className="w-full sm:w-auto bg-gradient-to-r from-[#C2185B] to-[#E91E8C] hover:opacity-90 font-semibold"
+              className="w-full sm:w-auto bg-primary hover:bg-primary-hover font-semibold"
             >
               <ExternalLink className="w-4 h-4 mr-2" />
               เปิดดู
@@ -421,7 +421,7 @@ const Index = () => {
       </Dialog>
 
       {/* Header */}
-      <header className="bg-gradient-to-r from-[#E91E8C] to-[#F06292] text-white shadow-lg sticky top-0 z-50">
+      <header className="bg-primary text-white shadow-lg sticky top-0 z-50">
         <div className="container mx-auto px-4 py-2.5">
           <div className="flex items-center justify-between">
             <div className="flex-1 text-center">
@@ -442,17 +442,17 @@ const Index = () => {
       <div className="container mx-auto px-4 py-6 max-w-6xl">
         {/* Info Badge */}
         <div className="mb-6 flex justify-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full shadow-soft border border-[#E91E8C]/20">
-            <Sparkles className="w-4 h-4 text-[#E91E8C]" />
-            <span className="text-sm font-medium text-[#C2185B]">
+          <div className="inline-flex items-center gap-2 px-4 py-2 glass-card rounded-full shadow-soft border border-border">
+            <Sparkles className="w-4 h-4 text-primary" />
+            <span className="text-sm font-medium text-foreground">
               AI วิเคราะห์ใบหน้าอัจฉริยะ
             </span>
           </div>
         </div>
 
         {/* How to Use Card */}
-        <Card className="mb-6 border-2 border-[#E91E8C]/20 glass-card shadow-card overflow-hidden cursor-pointer hover:shadow-elegant transition-all hover:scale-[1.02]" onClick={() => navigate("/how-to-use")}>
-          <div className="bg-gradient-to-r from-[#F06292] to-[#EC407A] px-4 py-3 flex items-center justify-between">
+        <Card className="mb-6 glass-card shadow-card overflow-hidden cursor-pointer hover:shadow-elegant transition-all hover:scale-[1.02]" onClick={() => navigate("/how-to-use")}>
+          <div className="bg-primary px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
                 <Info className="w-5 h-5 text-white" />
@@ -467,28 +467,28 @@ const Index = () => {
         </Card>
 
         {/* Feature Selection (only show when no image uploaded) */}
-        {!uploadedImageUrl && !analysis && <div className="mb-6 p-6 bg-white/80 backdrop-blur-sm rounded-2xl border-2 border-[#E91E8C]/20 shadow-card">
+        {!uploadedImageUrl && !analysis && <div className="mb-6 p-6 glass-card rounded-2xl shadow-card">
             <div className="text-center mb-4">
-              <h3 className="text-xl font-bold text-[#C2185B] mb-2">เริ่มต้นวิเคราะห์ใบหน้า</h3>
-              <p className="text-sm text-gray-600">เลือกวิธีการที่คุณต้องการ</p>
+              <h3 className="text-xl font-bold text-foreground mb-2">เริ่มต้นวิเคราะห์ใบหน้า</h3>
+              <p className="text-sm text-muted-foreground">เลือกวิธีการที่คุณต้องการ</p>
             </div>
             
             <div className="grid md:grid-cols-2 gap-4">
               {/* Face Scan Option */}
-              <div className="group border-2 border-[#E91E8C]/30 rounded-2xl p-6 text-center 
-                         hover:border-[#E91E8C] hover:bg-[#FFF0F5]/50 transition-all cursor-pointer 
+              <div className="group border-2 border-primary/30 rounded-2xl p-6 text-center 
+                         hover:border-primary hover:bg-accent transition-all cursor-pointer 
                          hover:scale-105 active:scale-95" onClick={() => setShowFaceScanner(true)}>
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#E91E8C] to-[#F06292] 
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary 
                               flex items-center justify-center group-hover:scale-110 transition-transform">
                   <Camera className="w-8 h-8 text-white" />
                 </div>
-                <h4 className="text-[#C2185B] font-bold text-lg mb-2">
+                <h4 className="text-foreground font-bold text-lg mb-2">
                   สแกนใบหน้าด้วย AI
                 </h4>
-                <p className="text-sm text-gray-600 mb-3">
+                <p className="text-sm text-muted-foreground mb-3">
                   AI ตรวจจับและถ่ายภาพอัตโนมัติ
                 </p>
-                <div className="flex flex-col gap-1 text-xs text-gray-500">
+                <div className="flex flex-col gap-1 text-xs text-muted-foreground">
                   <span>✓ ตรวจจับใบหน้า Real-time</span>
                   <span>✓ ถ่ายภาพอัตโนมัติ</span>
                   <span>✓ ได้ภาพคุณภาพสูง</span>
@@ -497,20 +497,20 @@ const Index = () => {
 
               {/* Upload Option */}
               <label htmlFor="file-upload-choice" className="cursor-pointer">
-                <div className="group border-2 border-purple-300 rounded-2xl p-6 text-center 
-                             hover:border-purple-500 hover:bg-purple-50 transition-all 
+                <div className="group border-2 border-secondary/50 rounded-2xl p-6 text-center 
+                             hover:border-secondary hover:bg-accent transition-all 
                              hover:scale-105 active:scale-95 h-full">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-secondary 
                                 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Upload className="w-8 h-8 text-white" />
+                    <Upload className="w-8 h-8 text-secondary-foreground" />
                   </div>
-                  <h4 className="text-purple-700 font-bold text-lg mb-2">
+                  <h4 className="text-foreground font-bold text-lg mb-2">
                     อัพโหลดรูปภาพ
                   </h4>
-                  <p className="text-sm text-gray-600 mb-3">
+                  <p className="text-sm text-muted-foreground mb-3">
                     เลือกรูปจากแกลเลอรี
                   </p>
-                  <div className="flex flex-col gap-1 text-xs text-gray-500">
+                  <div className="flex flex-col gap-1 text-xs text-muted-foreground">
                     <span>✓ ใช้รูปที่มีอยู่แล้ว</span>
                     <span>✓ รองรับทุกรูปแบบ</span>
                     <span>✓ เลือกรูปที่ชอบ</span>
@@ -522,8 +522,8 @@ const Index = () => {
           </div>}
 
         {/* Image Preview & Analysis Section (only show when image is uploaded) */}
-        {uploadedImageUrl && <Card className="mb-6 border-2 border-[#E91E8C]/20 glass-card shadow-card overflow-hidden">
-            <div className="bg-gradient-to-r from-[#E91E8C] to-[#F06292] px-4 py-3">
+        {uploadedImageUrl && <Card className="mb-6 glass-card shadow-card overflow-hidden">
+            <div className="bg-primary px-4 py-3">
               <h2 className="text-white font-bold text-lg flex items-center gap-2">
                 <Sparkles className="w-5 h-5" />
                 รูปภาพของคุณ
@@ -533,7 +533,7 @@ const Index = () => {
             <div className="p-4">
               <div className="space-y-4">
                 {/* Image Preview */}
-                <div className="relative rounded-2xl overflow-hidden border-2 border-[#E91E8C]/30 group">
+                <div className="relative rounded-2xl overflow-hidden border-2 border-border group">
                   <img src={uploadedImageUrl} alt="Uploaded Face" className="w-full h-auto" />
                   {!analysis && <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4">
                       <p className="text-white text-sm font-medium">รูปภาพพร้อมวิเคราะห์</p>
@@ -542,7 +542,7 @@ const Index = () => {
 
                 {/* Action Buttons */}
                 {!analysis && <div className="grid grid-cols-2 gap-3">
-                    <Button onClick={performAnalysis} disabled={analyzing} size="lg" className="bg-gradient-to-r from-[#E91E8C] to-[#F06292] hover:opacity-90 font-semibold">
+                    <Button onClick={performAnalysis} disabled={analyzing} size="lg" className="bg-primary hover:bg-primary-hover font-semibold">
                       {analyzing ? <>
                           <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                           วิเคราะห์...
@@ -552,7 +552,7 @@ const Index = () => {
                         </>}
                     </Button>
                     
-                    <Button onClick={resetAll} variant="outline" size="lg" className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold">
+                    <Button onClick={resetAll} variant="outline" size="lg" className="font-semibold">
                       เริ่มใหม่
                     </Button>
                   </div>}
@@ -561,8 +561,8 @@ const Index = () => {
           </Card>}
 
         {/* Analyzing Status */}
-        {analyzing && <Card className="border-2 border-[#E91E8C]/20 glass-card shadow-card overflow-hidden mb-6">
-            <div className="bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-3">
+        {analyzing && <Card className="glass-card shadow-card overflow-hidden mb-6">
+            <div className="bg-primary px-4 py-3">
               <h2 className="text-white font-bold text-lg flex items-center gap-2">
                 <Loader2 className="w-5 h-5 animate-spin" />
                 กำลังประมวลผล
@@ -571,17 +571,17 @@ const Index = () => {
             <div className="p-6">
               <div className="flex flex-col items-center gap-4">
                 <div className="relative">
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#E91E8C] to-[#F06292] flex items-center justify-center">
+                  <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center">
                     <Loader2 className="w-10 h-10 text-white animate-spin" />
                   </div>
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#E91E8C] to-[#F06292] opacity-20 animate-ping" />
+                  <div className="absolute inset-0 rounded-full bg-primary opacity-20 animate-ping" />
                 </div>
                 <div className="text-center">
-                  <p className="text-[#C2185B] font-bold text-lg mb-1">AI กำลังวิเคราะห์ใบหน้า</p>
-                  <p className="text-gray-600 text-sm">กรุณารอสักครู่...</p>
+                  <p className="text-foreground font-bold text-lg mb-1">AI กำลังวิเคราะห์ใบหน้า</p>
+                  <p className="text-muted-foreground text-sm">กรุณารอสักครู่...</p>
                 </div>
-                <div className="w-full max-w-xs bg-gray-200 rounded-full h-2 overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-[#E91E8C] to-[#F06292] animate-pulse" style={{
+                <div className="w-full max-w-xs bg-muted rounded-full h-2 overflow-hidden">
+                  <div className="h-full bg-primary animate-pulse" style={{
                 width: '70%'
               }} />
                 </div>
@@ -591,15 +591,15 @@ const Index = () => {
 
         {/* Reset Button (show after analysis) */}
         {analysis && <div className="flex justify-center mb-6">
-            <Button onClick={resetAll} size="lg" className="bg-gradient-to-r from-gray-600 to-gray-700 hover:opacity-90 text-white font-semibold shadow-lg">
+            <Button onClick={resetAll} size="lg" className="bg-secondary hover:bg-secondary/80 text-secondary-foreground font-semibold shadow-lg">
               <Upload className="w-5 h-5 mr-2" />
               วิเคราะห์รูปใหม่
             </Button>
           </div>}
 
         {/* Analysis Results */}
-        {analysis && <Card className="border-2 border-[#E91E8C]/20 glass-card shadow-card overflow-hidden">
-            <div className="bg-gradient-to-r from-[#E91E8C] via-[#F06292] to-[#E91E8C] px-4 py-3">
+        {analysis && <Card className="glass-card shadow-card overflow-hidden">
+            <div className="bg-primary px-4 py-3">
               <h2 className="text-white font-bold text-lg flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5" />
                 ผลการวิเคราะห์ใบหน้า
@@ -615,16 +615,16 @@ const Index = () => {
                     </div>}
 
                   {/* Face Shape */}
-                  {analysis.faceShape && <div className="p-4 bg-gradient-to-r from-[#FFF0F5] to-[#FFE4F0] rounded-xl border border-[#E91E8C]/20">
-                      <h3 className="font-bold text-[#C2185B] mb-2 flex items-center gap-2">
-                        <span className="w-2 h-2 bg-[#E91E8C] rounded-full"></span>
+                  {analysis.faceShape && <div className="p-4 bg-accent rounded-xl border border-border">
+                      <h3 className="font-bold text-foreground mb-2 flex items-center gap-2">
+                        <span className="w-2 h-2 bg-primary rounded-full"></span>
                         รูปหน้า
                       </h3>
-                      <p className="text-sm text-gray-700">{analysis.faceShape}</p>
+                      <p className="text-sm text-muted-foreground">{analysis.faceShape}</p>
                     </div>}
 
                   {/* Estimated Age */}
-                  {analysis.estimatedAge && <div className="p-6 bg-gradient-to-br from-[#9C27B0] to-[#BA68C8] rounded-2xl shadow-elegant">
+                  {analysis.estimatedAge && <div className="p-6 bg-primary rounded-2xl shadow-elegant">
                       <div className="text-center mb-4">
                         <h3 className="text-white font-bold text-lg mb-2 flex items-center justify-center gap-2">
                           <Sparkles className="w-5 h-5" />
@@ -650,7 +650,7 @@ const Index = () => {
                     </div>}
 
                   {/* Beauty Score */}
-                  {analysis.beautyScore && <div className="p-6 bg-gradient-to-br from-[#E91E8C] to-[#F06292] rounded-2xl shadow-elegant">
+                  {analysis.beautyScore && <div className="p-6 bg-primary rounded-2xl shadow-elegant">
                       <div className="text-center mb-4">
                         <h3 className="text-white font-bold text-lg mb-2 flex items-center justify-center gap-2">
                           <Sparkles className="w-5 h-5" />
@@ -676,31 +676,31 @@ const Index = () => {
                     </div>}
 
                   {/* Current Features */}
-                  {analysis.currentFeatures && <div className="p-4 bg-gradient-to-r from-[#FFF0F5] to-[#FFE4F0] rounded-xl border border-[#E91E8C]/20">
-                      <h3 className="font-bold text-[#C2185B] mb-2 flex items-center gap-2">
-                        <span className="w-2 h-2 bg-[#E91E8C] rounded-full"></span>
+                  {analysis.currentFeatures && <div className="p-4 bg-accent rounded-xl border border-border">
+                      <h3 className="font-bold text-foreground mb-2 flex items-center gap-2">
+                        <span className="w-2 h-2 bg-primary rounded-full"></span>
                         ลักษณะปัจจุบัน
                       </h3>
-                      <p className="text-sm text-gray-700">{analysis.currentFeatures}</p>
+                      <p className="text-sm text-muted-foreground">{analysis.currentFeatures}</p>
                     </div>}
 
                   {/* Recommendations */}
                   {analysis.recommendations && analysis.recommendations.length > 0 && <div>
-                      <h3 className="font-bold text-[#C2185B] mb-3 text-lg">
+                      <h3 className="font-bold text-foreground mb-3 text-lg">
                         💉 คำแนะนำการเติมฟิลเลอร์
                       </h3>
                       <div className="space-y-3">
-                        {analysis.recommendations.map((rec: any, index: number) => <div key={index} className="p-4 bg-white rounded-xl border-2 border-[#E91E8C]/20 hover:border-[#E91E8C]/40 
+                        {analysis.recommendations.map((rec: any, index: number) => <div key={index} className="p-4 bg-background rounded-xl border-2 border-border hover:border-primary/40 
                                      transition-all shadow-sm hover:shadow-soft">
                             <div className="flex justify-between items-start mb-2">
-                              <h4 className="font-bold text-[#C2185B] text-base">{rec.area}</h4>
-                              <span className={`text-xs px-3 py-1 rounded-full font-semibold ${rec.priority === 'สูง' ? 'bg-[#E91E8C] text-white' : rec.priority === 'กลาง' ? 'bg-[#F06292] text-white' : 'bg-[#FFE4F0] text-[#C2185B]'}`}>
+                              <h4 className="font-bold text-foreground text-base">{rec.area}</h4>
+                              <span className={`text-xs px-3 py-1 rounded-full font-semibold ${rec.priority === 'สูง' ? 'bg-primary text-white' : rec.priority === 'กลาง' ? 'bg-secondary text-secondary-foreground' : 'bg-accent text-accent-foreground'}`}>
                                 {rec.priority}
                               </span>
                             </div>
-                            <p className="text-sm text-gray-600 mb-3">{rec.benefit}</p>
-                            <div className="flex justify-between items-center text-sm pt-2 border-t border-[#E91E8C]/10">
-                              <span className="text-gray-600">ปริมาณ: <strong>{rec.amount}</strong></span>
+                            <p className="text-sm text-muted-foreground mb-3">{rec.benefit}</p>
+                            <div className="flex justify-between items-center text-sm pt-2 border-t border-border">
+                              <span className="text-muted-foreground">ปริมาณ: <strong>{rec.amount}</strong></span>
                             </div>
                           </div>)}
                       </div>
@@ -708,23 +708,23 @@ const Index = () => {
 
 
                   {/* Additional Notes */}
-                  {analysis.additionalNotes && <div className="p-4 bg-gradient-to-r from-[#FFF0F5] to-[#FFE4F0] rounded-xl border border-[#E91E8C]/20">
-                      <h3 className="font-bold text-[#C2185B] mb-2 flex items-center gap-2">
-                        <span className="w-2 h-2 bg-[#E91E8C] rounded-full"></span>
+                  {analysis.additionalNotes && <div className="p-4 bg-accent rounded-xl border border-border">
+                      <h3 className="font-bold text-foreground mb-2 flex items-center gap-2">
+                        <span className="w-2 h-2 bg-primary rounded-full"></span>
                         คำแนะนำเพิ่มเติม
                       </h3>
-                      <p className="text-sm text-gray-700">{analysis.additionalNotes}</p>
+                      <p className="text-sm text-muted-foreground">{analysis.additionalNotes}</p>
                     </div>}
 
                   {/* Raw Analysis (fallback) */}
-                  {analysis.rawAnalysis && !analysis.recommendations && <div className="p-4 bg-gradient-to-r from-[#FFF0F5] to-[#FFE4F0] rounded-xl border border-[#E91E8C]/20">
-                      <h3 className="font-bold text-[#C2185B] mb-2">ผลการวิเคราะห์</h3>
-                      <p className="text-sm text-gray-700 whitespace-pre-wrap">{analysis.rawAnalysis}</p>
+                  {analysis.rawAnalysis && !analysis.recommendations && <div className="p-4 bg-accent rounded-xl border border-border">
+                      <h3 className="font-bold text-foreground mb-2">ผลการวิเคราะห์</h3>
+                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{analysis.rawAnalysis}</p>
                     </div>}
 
                   {/* Share Buttons */}
                   <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                    <Button onClick={handleDownload} disabled={generatingImage} className="flex-1 bg-gradient-to-r from-[#9C27B0] to-[#BA68C8] hover:opacity-90 font-semibold h-12">
+                    <Button onClick={handleDownload} disabled={generatingImage} className="flex-1 bg-secondary hover:bg-secondary/80 text-secondary-foreground font-semibold h-12">
                       {generatingImage ? <>
                           <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                           กำลังสร้างรูป...
@@ -734,7 +734,7 @@ const Index = () => {
                         </>}
                     </Button>
                     
-                    <Button onClick={handleShare} disabled={generatingImage} className="flex-1 bg-gradient-to-r from-[#E91E8C] to-[#F06292] hover:opacity-90 font-semibold h-12">
+                    <Button onClick={handleShare} disabled={generatingImage} className="flex-1 bg-primary hover:bg-primary-hover font-semibold h-12">
                       {generatingImage ? <>
                           <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                           กำลังสร้างรูป...
@@ -746,8 +746,8 @@ const Index = () => {
                   </div>
 
                   {/* Info Text */}
-                  <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-200">
-                    <p className="text-sm text-gray-700 text-center">
+                  <div className="mt-4 p-4 bg-accent rounded-xl border border-border">
+                    <p className="text-sm text-muted-foreground text-center">
                       💡 <strong>วิธีแชร์ใน Instagram Story:</strong> กดดาวน์โหลดรูป → เปิด Instagram → เพิ่ม Story → เลือกรูปที่ดาวน์โหลด
                     </p>
                   </div>
@@ -756,13 +756,13 @@ const Index = () => {
           </Card>}
 
         {/* Singderm Brand Promotion Section */}
-        <Card className="mt-6 border-2 border-[#E91E8C]/30 glass-card shadow-elegant overflow-hidden">
+        <Card className="mt-6 glass-card shadow-elegant overflow-hidden">
 
         {/* Hidden Result Image for Generation */}
         <div className="fixed -left-[9999px] -top-[9999px]">
           {analysis && uploadedImageUrl && <ResultImage key={`result-${Date.now()}`} ref={resultImageRef} analysis={analysis} imageUrl={uploadedImageUrl} />}
         </div>
-          <div className="bg-gradient-to-r from-[#E91E8C] via-[#F06292] to-[#E91E8C] px-4 py-4">
+          <div className="bg-primary px-4 py-4">
             <div className="text-center">
               <h2 className="text-white font-bold text-2xl mb-1">
                 ✨ Singderm Thailand ✨
@@ -777,57 +777,57 @@ const Index = () => {
           <div className="p-6 space-y-6">
             {/* Trust Badges */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="text-center p-3 bg-gradient-to-br from-[#FFF0F5] to-[#FFE4F0] rounded-xl border border-[#E91E8C]/20">
+              <div className="text-center p-3 bg-accent rounded-xl border border-border">
                 <div className="text-2xl mb-1">🏆</div>
-                <p className="text-xs font-semibold text-[#C2185B]">มาตรฐานสากล</p>
+                <p className="text-xs font-semibold text-foreground">มาตรฐานสากล</p>
               </div>
               
-              <div className="text-center p-3 bg-gradient-to-br from-[#FFF0F5] to-[#FFE4F0] rounded-xl border border-[#E91E8C]/20">
+              <div className="text-center p-3 bg-accent rounded-xl border border-border">
                 <div className="text-2xl mb-1">CN</div>
-                <p className="text-xs font-semibold text-[#C2185B]">Made in China</p>
+                <p className="text-xs font-semibold text-foreground">Made in China</p>
               </div>
-              <div className="text-center p-3 bg-gradient-to-br from-[#FFF0F5] to-[#FFE4F0] rounded-xl border border-[#E91E8C]/20">
+              <div className="text-center p-3 bg-accent rounded-xl border border-border">
                 <div className="text-2xl mb-1">💎</div>
-                <p className="text-xs font-semibold text-[#C2185B]">คุณภาพพรีเมียม</p>
+                <p className="text-xs font-semibold text-foreground">คุณภาพพรีเมียม</p>
               </div>
             </div>
 
             {/* Official Importer */}
-            <div className="bg-gradient-to-r from-[#E91E8C]/10 to-[#F06292]/10 border-2 border-[#E91E8C]/30 rounded-xl p-4">
+            <div className="bg-accent border-2 border-border rounded-xl p-4">
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#E91E8C] to-[#F06292] flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
                   <CheckCircle2 className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-[#C2185B] mb-1">นำเข้าโดย Pola Group จำกัด</h3>
-                  <p className="text-sm text-gray-700">ผู้นำเข้าเพียงรายเดียวในประเทศไทย รับประกันของแท้ 100%</p>
+                  <h3 className="font-bold text-foreground mb-1">นำเข้าโดย Pola Group จำกัด</h3>
+                  <p className="text-sm text-muted-foreground">ผู้นำเข้าเพียงรายเดียวในประเทศไทย รับประกันของแท้ 100%</p>
                 </div>
               </div>
             </div>
 
             {/* Product Lines */}
             <div>
-              <h3 className="font-bold text-[#C2185B] text-xl mb-4 text-center">
+              <h3 className="font-bold text-foreground text-xl mb-4 text-center">
                 ผลิตภัณฑ์ที่แนะนำ
               </h3>
               
               <div className="space-y-4">
                 {/* Hyaluronic Acid Dermal Filler */}
-                <div className="p-4 bg-white rounded-xl border-2 border-[#E91E8C]/20 hover:border-[#E91E8C]/40 transition-all">
+                <div className="p-4 bg-background rounded-xl border-2 border-border hover:border-primary/40 transition-all">
                   <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#E91E8C] to-[#F06292] flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
                       <span className="text-2xl">💧</span>
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-bold text-[#C2185B] mb-2">Hyaluronic Acid Dermal Filler</h4>
-                      <p className="text-sm text-gray-700 mb-2">ฟิลเลอร์กรดไฮยาลูรอนิก ใช้สำหรับการเติมเต็มให้แก่ผิวบนใบหน้า</p>
-                      <ul className="text-sm text-gray-600 space-y-1">
+                      <h4 className="font-bold text-foreground mb-2">Hyaluronic Acid Dermal Filler</h4>
+                      <p className="text-sm text-muted-foreground mb-2">ฟิลเลอร์กรดไฮยาลูรอนิก ใช้สำหรับการเติมเต็มให้แก่ผิวบนใบหน้า</p>
+                      <ul className="text-sm text-muted-foreground space-y-1">
                         <li className="flex items-start gap-2">
-                          <span className="text-[#E91E8C] mt-0.5">•</span>
+                          <span className="text-primary mt-0.5">•</span>
                           <span>ช่วยแก้ไขร่องลึก ปรับรูปหน้าให้มีมิติ</span>
                         </li>
                         <li className="flex items-start gap-2">
-                          <span className="text-[#E91E8C] mt-0.5">•</span>
+                          <span className="text-primary mt-0.5">•</span>
                           <span>คืนความอ่อนเยาว์ ความสดใส เป็นธรรมชาติ</span>
                         </li>
                       </ul>
@@ -836,21 +836,21 @@ const Index = () => {
                 </div>
 
                 {/* Collagen Stimulating Filler */}
-                <div className="p-4 bg-white rounded-xl border-2 border-[#E91E8C]/20 hover:border-[#E91E8C]/40 transition-all">
+                <div className="p-4 bg-background rounded-xl border-2 border-border hover:border-primary/40 transition-all">
                   <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#F06292] to-[#E91E8C] flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
                       <span className="text-2xl">⚡</span>
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-bold text-[#C2185B] mb-2">Collagen Stimulating Filler</h4>
-                      <p className="text-sm text-gray-700 mb-2">ฟิลเลอร์ช่วยเติมเต็มผิว พร้อมกระตุ้นการสร้างคอลลาเจนใหม่</p>
-                      <ul className="text-sm text-gray-600 space-y-1">
+                      <h4 className="font-bold text-foreground mb-2">Collagen Stimulating Filler</h4>
+                      <p className="text-sm text-muted-foreground mb-2">ฟิลเลอร์ช่วยเติมเต็มผิว พร้อมกระตุ้นการสร้างคอลลาเจนใหม่</p>
+                      <ul className="text-sm text-muted-foreground space-y-1">
                         <li className="flex items-start gap-2">
-                          <span className="text-[#E91E8C] mt-0.5">•</span>
+                          <span className="text-primary mt-0.5">•</span>
                           <span>เพิ่มความยืดหยุ่น ความกระชับ</span>
                         </li>
                         <li className="flex items-start gap-2">
-                          <span className="text-[#E91E8C] mt-0.5">•</span>
+                          <span className="text-primary mt-0.5">•</span>
                           <span>ช่วยให้ผิวดูเรียบเนียน ลดเลือนริ้วรอยได้อย่างยาวนาน</span>
                         </li>
                       </ul>
@@ -859,21 +859,21 @@ const Index = () => {
                 </div>
 
                 {/* Skin Booster */}
-                <div className="p-4 bg-white rounded-xl border-2 border-[#E91E8C]/20 hover:border-[#E91E8C]/40 transition-all">
+                <div className="p-4 bg-background rounded-xl border-2 border-border hover:border-primary/40 transition-all">
                   <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#E91E8C] to-[#F06292] flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
                       <span className="text-2xl">✨</span>
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-bold text-[#C2185B] mb-2">Skin Booster</h4>
-                      <p className="text-sm text-gray-700 mb-2">สกินบูสเตอร์ ใช้ในการบำรุง เติมเต็มความชุ่มชื้นสู่ผิวจากภายใน</p>
-                      <ul className="text-sm text-gray-600 space-y-1">
+                      <h4 className="font-bold text-foreground mb-2">Skin Booster</h4>
+                      <p className="text-sm text-muted-foreground mb-2">สกินบูสเตอร์ ใช้ในการบำรุง เติมเต็มความชุ่มชื้นสู่ผิวจากภายใน</p>
+                      <ul className="text-sm text-muted-foreground space-y-1">
                         <li className="flex items-start gap-2">
-                          <span className="text-[#E91E8C] mt-0.5">•</span>
+                          <span className="text-primary mt-0.5">•</span>
                           <span>พร้อมช่วยฟื้นฟูสภาพผิวให้สดใส</span>
                         </li>
                         <li className="flex items-start gap-2">
-                          <span className="text-[#E91E8C] mt-0.5">•</span>
+                          <span className="text-primary mt-0.5">•</span>
                           <span>ช่วยให้ผิวดูสุขภาพดี อิ่มฟู อ่อนเยาว์มากยิ่งขึ้น</span>
                         </li>
                       </ul>
@@ -900,7 +900,7 @@ const Index = () => {
             </div>
 
             {/* Why Choose Singderm */}
-            <div className="bg-gradient-to-r from-[#E91E8C] to-[#F06292] rounded-xl p-5 text-white">
+            <div className="bg-primary rounded-xl p-5 text-white">
               <h3 className="font-bold text-xl mb-4 text-center">ทำไมต้องเลือก Singderm?</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex items-start gap-2">
@@ -917,7 +917,7 @@ const Index = () => {
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-lg mt-0.5">✓</span>
-                  <p className="text-sm">ผลลัพธ์เป็นธรรมชาติ </p>
+                  <p className="text-sm">ผลลัพธ์เป็นธรรมชาติ </p>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-lg mt-0.5">✓</span>
@@ -932,8 +932,8 @@ const Index = () => {
 
             {/* CTA Button */}
             <div className="text-center">
-              <a href="https://singdermthailand.com/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#E91E8C] to-[#F06292] 
-                         text-white font-bold rounded-full hover:opacity-90 transition-all shadow-elegant 
+              <a href="https://singdermthailand.com/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-8 py-4 bg-primary 
+                         text-white font-bold rounded-full hover:bg-primary-hover transition-all shadow-elegant 
                          hover:scale-105 active:scale-95">
                 <span>เรียนรู้เพิ่มเติมเกี่ยวกับ Singderm</span>
                 <ExternalLink className="w-5 h-5" />
