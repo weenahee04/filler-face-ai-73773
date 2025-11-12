@@ -12,7 +12,7 @@ export const Header = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="text-2xl font-bold text-foreground hover:text-primary transition-colors">
-            face<span className="text-primary">ai</span>.
+            Pola <span className="text-primary">ai</span>.
           </Link>
 
           {/* Desktop Navigation */}
