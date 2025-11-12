@@ -20,7 +20,9 @@ export const ResultImage = forwardRef<HTMLDivElement, ResultImageProps>(
           <Sparkles className="w-10 h-10" />
           ผลการวิเคราะห์ใบหน้า AI
         </h1>
-        <p className="text-white/90 text-2xl">Singderm Thailand</p>
+        <div className="text-white/90 text-3xl font-bold">
+          Pola <span className="text-white">AI</span>
+        </div>
       </div>
 
       {/* Image */}
@@ -99,9 +101,11 @@ export const ResultImage = forwardRef<HTMLDivElement, ResultImageProps>(
 
       {/* Footer */}
       <div className="mt-auto text-center pt-6">
-        <div className="text-white text-3xl font-bold mb-2">✨ Singderm Thailand ✨</div>
-        <div className="text-white/90 text-xl">ฟิลเลอร์พรีเมียมจากจีน</div>
-        <div className="text-white/80 text-base mt-2">AI Face Analysis by Singderm</div>
+        <div className="text-white text-4xl font-bold mb-2">
+          ✨ Pola <span className="text-white">AI</span> ✨
+        </div>
+        <div className="text-white/90 text-xl">Powered by Singderm Thailand</div>
+        <div className="text-white/80 text-base mt-2">AI Face Analysis Technology</div>
       </div>
     </div>
   );
