@@ -14,6 +14,7 @@ import SkinAnalysis from "./pages/SkinAnalysis";
 import Forum from "./pages/Forum";
 import ForumCreate from "./pages/ForumCreate";
 import ForumPost from "./pages/ForumPost";
+import SkinCareJournal from "./pages/SkinCareJournal";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/forum" element={<Forum />} />
           <Route path="/forum/create" element={<ForumCreate />} />
           <Route path="/forum/post/:id" element={<ForumPost />} />
+          <Route path="/journal" element={<SkinCareJournal />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

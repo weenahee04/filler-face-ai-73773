@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Menu, MessageCircle, LogOut, User, UserCircle, Clock, Sparkles, Users } from "lucide-react";
+import { Menu, MessageCircle, LogOut, User, UserCircle, Clock, Sparkles, Users, BookOpen } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -178,6 +178,15 @@ export const Header = () => {
               <Sparkles className="w-4 h-4 lg:mr-2" />
               <span className="hidden xl:inline">วิเคราะห์ผิวหน้า</span>
             </Button>
+
+            <Button 
+              variant="ghost"
+              onClick={() => navigate("/journal")}
+              className="text-sm font-medium px-3"
+            >
+              <BookOpen className="w-4 h-4 lg:mr-2" />
+              <span className="hidden xl:inline">สมุดบันทึก</span>
+            </Button>
             
             {user ? (
               <DropdownMenu>
@@ -289,6 +298,18 @@ export const Header = () => {
               >
                 <Sparkles className="w-4 h-4 mr-2" />
                 วิเคราะห์ผิวหน้า
+              </Button>
+
+              <Button 
+                variant="ghost"
+                onClick={() => {
+                  navigate("/journal");
+                  setMobileMenuOpen(false);
+                }}
+                className="text-sm font-medium justify-start"
+              >
+                <BookOpen className="w-4 h-4 mr-2" />
+                สมุดบันทึก
               </Button>
 
               {user ? (

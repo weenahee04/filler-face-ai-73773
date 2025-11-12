@@ -321,6 +321,45 @@ export type Database = {
         }
         Relationships: []
       }
+      skin_care_journal: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string | null
+          journal_date: string
+          mood: string | null
+          notes: string | null
+          products_used: string[] | null
+          skin_conditions: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          journal_date?: string
+          mood?: string | null
+          notes?: string | null
+          products_used?: string[] | null
+          skin_conditions?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          journal_date?: string
+          mood?: string | null
+          notes?: string | null
+          products_used?: string[] | null
+          skin_conditions?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       treatment_history: {
         Row: {
           after_image_url: string | null
