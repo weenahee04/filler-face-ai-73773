@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import html2canvas from "html2canvas";
 import { ResultImage } from "@/components/ResultImage";
-import { FaceScanner } from "@/components/FaceScanner";
+import { SimpleFaceScanner } from "@/components/SimpleFaceScanner";
 import { Header } from "@/components/Header";
 import { checkBrowserCompatibility, getRecommendedBrowsers, isMobileDevice } from "@/lib/browser-compatibility";
 import { AlertCircle } from "lucide-react";
@@ -322,30 +322,26 @@ const Index = () => {
   };
 
   const handleOpenFaceScanner = () => {
-    const compatibility = checkBrowserCompatibility();
-    
-    if (!compatibility.isCompatible) {
-      console.log('Browser compatibility check failed:', compatibility);
-      setShowCompatibilityWarning(true);
-      
+    // Simple check for camera access only
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      console.log('Camera not supported');
       toast({
-        title: "⚠️ เบราว์เซอร์ไม่รองรับการสแกนใบหน้า",
-        description: `ฟีเจอร์บางอย่างไม่พร้อมใช้งาน: ${compatibility.missingFeatures.join(", ")}`,
+        title: "⚠️ เบราว์เซอร์ไม่รองรับกล้อง",
+        description: "เบราว์เซอร์ของคุณไม่รองรับการเข้าถึงกล้อง กรุณาใช้เบราว์เซอร์ที่ทันสมัยกว่า",
         variant: "destructive",
         duration: 8000
       });
-      
       return;
     }
     
-    console.log('Browser compatibility check passed:', compatibility);
+    console.log('Opening camera...');
     setShowFaceScanner(true);
   };
   return <div className="min-h-screen mint-gradient-bg">
       <Header />
       
       {/* Face Scanner */}
-      {showFaceScanner && <FaceScanner onCapture={handleFaceCapture} onClose={() => setShowFaceScanner(false)} />}
+      {showFaceScanner && <SimpleFaceScanner onCapture={handleFaceCapture} onClose={() => setShowFaceScanner(false)} />}
 
       {/* Consent Dialog */}
       <Dialog open={showConsent} onOpenChange={setShowConsent}>
@@ -546,14 +542,14 @@ const Index = () => {
                   <Camera className="w-8 h-8 text-white" />
                 </div>
                 <h4 className="text-foreground font-bold text-lg mb-2">
-                  สแกนใบหน้าด้วย AI
+                  ถ่ายภาพใบหน้า
                 </h4>
                 <p className="text-sm text-muted-foreground mb-3">
-                  AI ตรวจจับและถ่ายภาพอัตโนมัติ
+                  เปิดกล้องและถ่ายภาพ
                 </p>
                 <div className="flex flex-col gap-1 text-xs text-muted-foreground">
-                  <span>✓ ตรวจจับใบหน้า Real-time</span>
-                  <span>✓ ถ่ายภาพอัตโนมัติ</span>
+                  <span>✓ ง่ายและรวดเร็ว</span>
+                  <span>✓ ถ่ายภาพทันที</span>
                   <span>✓ ได้ภาพคุณภาพสูง</span>
                 </div>
               </div>
