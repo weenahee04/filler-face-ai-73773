@@ -984,7 +984,7 @@ const Index = () => {
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-lg mt-0.5">✓</span>
-                  <p className="text-sm">เทคโนโลยีล้ำสมัยจากเกาหลี</p>
+                  <p className="text-sm">เทคโนโลยีล้ำสมัยจากจีน</p>
                 </div>
               </div>
             </div>
