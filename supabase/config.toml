@@ -16,6 +16,9 @@ enabled = false
 [functions.ai-consultation]
 verify_jwt = true
 
+[functions.age-progression]
+verify_jwt = false
+
 [functions.analyze-face]
 verify_jwt = false
 

@@ -9,6 +9,7 @@ import HowToUse from "./pages/HowToUse";
 import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
 import Consultation from "./pages/Consultation";
+import AgeProgression from "./pages/AgeProgression";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/profile/:id" element={<Profile />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/consultation" element={<Consultation />} />
+          <Route path="/age-progression" element={<AgeProgression />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
