@@ -167,21 +167,21 @@ const AgeProgression = () => {
           กลับหน้าหลัก
         </Button>
 
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Clock className="h-8 w-8 text-primary" />
-            <Sparkles className="h-6 w-6 text-secondary animate-pulse" />
+        <div className="text-center mb-6 md:mb-8">
+          <div className="flex items-center justify-center gap-2 mb-3 md:mb-4">
+            <Clock className="h-6 w-6 md:h-8 md:w-8 text-primary" />
+            <Sparkles className="h-5 w-5 md:h-6 md:w-6 text-secondary animate-pulse" />
           </div>
-          <h1 className="text-4xl font-bold mb-2">AI Age Progression</h1>
-          <p className="text-muted-foreground text-lg">
+          <h1 className="text-2xl md:text-4xl font-bold mb-2">AI Age Progression</h1>
+          <p className="text-muted-foreground text-sm md:text-lg px-4">
             ดูใบหน้าของคุณในอนาคต 10, 20, 30 ปี
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-4 md:gap-8 max-w-6xl mx-auto">
           {/* Upload Section */}
-          <Card className="p-6">
-            <h2 className="text-xl font-bold mb-4">อัปโหลดรูปภาพ</h2>
+          <Card className="p-4 md:p-6">
+            <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4">อัปโหลดรูปภาพ</h2>
             
             <div className="space-y-4">
               <div>
@@ -253,8 +253,8 @@ const AgeProgression = () => {
           </Card>
 
           {/* Results Section */}
-          <Card className="p-6">
-            <h2 className="text-xl font-bold mb-4">ผลลัพธ์</h2>
+          <Card className="p-4 md:p-6">
+            <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4">ผลลัพธ์</h2>
             
             {results.length === 0 ? (
               <div className="text-center py-12">
@@ -266,21 +266,20 @@ const AgeProgression = () => {
             ) : (
               <div className="space-y-6">
                 {results.map((result) => (
-                  <div key={result.years} className="space-y-3">
+                  <div key={result.years} className="space-y-2 md:space-y-3">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-bold text-lg">
+                      <h3 className="font-bold text-base md:text-lg">
                         +{result.years} ปี
                       </h3>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleDownload(result.imageUrl, result.years)}
-                        >
-                          <Download className="h-4 w-4 mr-1" />
-                          ดาวน์โหลด
-                        </Button>
-                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDownload(result.imageUrl, result.years)}
+                        className="h-8"
+                      >
+                        <Download className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                        <span className="hidden sm:inline ml-1">ดาวน์โหลด</span>
+                      </Button>
                     </div>
                     <img 
                       src={result.imageUrl} 

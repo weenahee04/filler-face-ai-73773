@@ -255,38 +255,38 @@ const Consultation = () => {
     <div className="h-screen flex flex-col bg-background">
       {/* Header */}
       <div className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <MessageCircle className="h-6 w-6 text-primary" />
-            <div>
-              <h1 className="text-xl font-bold">ปรึกษาศัลยกรรม AI</h1>
-              <p className="text-sm text-muted-foreground">ถามคำถามเกี่ยวกับศัลยกรรมได้ทุกเรื่อง</p>
+        <div className="container mx-auto px-4 py-3 md:py-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 md:gap-3 min-w-0">
+            <MessageCircle className="h-5 w-5 md:h-6 md:w-6 text-primary flex-shrink-0" />
+            <div className="min-w-0">
+              <h1 className="text-base md:text-xl font-bold truncate">ปรึกษาศัลยกรรม AI</h1>
+              <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">ถามคำถามเกี่ยวกับศัลยกรรมได้ทุกเรื่อง</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => navigate("/")}>
-              <Home className="h-4 w-4 mr-2" />
-              หน้าแรก
+          <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
+            <Button variant="outline" size="sm" onClick={() => navigate("/")} className="h-8 md:h-9">
+              <Home className="h-4 w-4" />
+              <span className="hidden sm:inline ml-2">หน้าแรก</span>
             </Button>
-            <Button variant="outline" size="sm" onClick={handleSignOut}>
-              <LogOut className="h-4 w-4 mr-2" />
-              ออกจากระบบ
+            <Button variant="outline" size="sm" onClick={handleSignOut} className="h-8 md:h-9">
+              <LogOut className="h-4 w-4" />
+              <span className="hidden sm:inline ml-2">ออกจากระบบ</span>
             </Button>
           </div>
         </div>
       </div>
 
       {/* Messages */}
-      <ScrollArea ref={scrollRef} className="flex-1 p-4">
-        <div className="container mx-auto max-w-3xl space-y-4">
+      <ScrollArea ref={scrollRef} className="flex-1 p-2 md:p-4">
+        <div className="container mx-auto max-w-3xl space-y-3 md:space-y-4">
           {messages.length === 0 && (
-            <Card className="p-8 text-center">
-              <MessageCircle className="h-12 w-12 mx-auto mb-4 text-primary opacity-50" />
-              <h2 className="text-lg font-semibold mb-2">ยินดีต้อนรับสู่การปรึกษาศัลยกรรม AI</h2>
-              <p className="text-muted-foreground mb-4">
+            <Card className="p-4 md:p-8 text-center">
+              <MessageCircle className="h-10 w-10 md:h-12 md:w-12 mx-auto mb-3 md:mb-4 text-primary opacity-50" />
+              <h2 className="text-base md:text-lg font-semibold mb-2">ยินดีต้อนรับสู่การปรึกษาศัลยกรรม AI</h2>
+              <p className="text-sm md:text-base text-muted-foreground mb-3 md:mb-4">
                 คุณสามารถถามคำถามหรือส่งรูปใบหน้าเพื่อรับคำปรึกษา
               </p>
-              <div className="text-sm text-muted-foreground text-left max-w-md mx-auto space-y-2">
+              <div className="text-xs md:text-sm text-muted-foreground text-left max-w-md mx-auto space-y-1 md:space-y-2">
                 <p>• วิเคราะห์ใบหน้าและแนะนำศัลยกรรมที่เหมาะสม</p>
                 <p>• อธิบายหัตถการต่างๆ เช่น ฟิลเลอร์ โบท็อกซ์</p>
                 <p>• แนะนำการดูแลและผลิตภัณฑ์</p>
@@ -297,14 +297,14 @@ const Consultation = () => {
           {messages.map((msg) => (
             <div
               key={msg.id}
-              className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+              className={`flex gap-2 md:gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
             >
-              <Avatar className="h-8 w-8 shrink-0">
+              <Avatar className="h-7 w-7 md:h-8 md:w-8 shrink-0">
                 <AvatarFallback className={msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-secondary'}>
                   {msg.role === 'user' ? 'U' : 'AI'}
                 </AvatarFallback>
               </Avatar>
-              <Card className={`max-w-[80%] p-3 ${msg.role === 'user' ? 'bg-primary text-primary-foreground' : ''}`}>
+              <Card className={`max-w-[85%] md:max-w-[80%] p-2.5 md:p-3 ${msg.role === 'user' ? 'bg-primary text-primary-foreground' : ''}`}>
                 {msg.image_url && (
                   <img
                     src={msg.image_url}
@@ -312,7 +312,7 @@ const Consultation = () => {
                     className="rounded-lg mb-2 max-w-full"
                   />
                 )}
-                <p className="whitespace-pre-wrap text-sm">{msg.content}</p>
+                <p className="whitespace-pre-wrap text-xs md:text-sm leading-relaxed">{msg.content}</p>
               </Card>
             </div>
           ))}
@@ -332,8 +332,8 @@ const Consultation = () => {
 
       {/* Input */}
       <div className="border-t bg-card">
-        <div className="container mx-auto max-w-3xl p-4">
-          <div className="flex gap-2">
+        <div className="container mx-auto max-w-3xl p-3 md:p-4">
+          <div className="flex gap-1.5 md:gap-2">
             <input
               ref={fileInputRef}
               type="file"
@@ -346,8 +346,9 @@ const Consultation = () => {
               size="icon"
               onClick={() => fileInputRef.current?.click()}
               disabled={loading || uploading}
+              className="h-9 w-9 md:h-10 md:w-10 flex-shrink-0"
             >
-              {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
+              {uploading ? <Loader2 className="h-3.5 w-3.5 md:h-4 md:w-4 animate-spin" /> : <ImageIcon className="h-3.5 w-3.5 md:h-4 md:w-4" />}
             </Button>
             <Input
               placeholder="พิมพ์ข้อความ..."
@@ -355,10 +356,15 @@ const Consultation = () => {
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
               disabled={loading}
-              className="flex-1"
+              className="flex-1 h-9 md:h-10 text-sm md:text-base"
             />
-            <Button onClick={handleSend} disabled={loading || !input.trim()}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            <Button 
+              onClick={handleSend} 
+              disabled={loading || !input.trim()}
+              className="h-9 w-9 md:h-10 md:w-10 flex-shrink-0"
+              size="icon"
+            >
+              {loading ? <Loader2 className="h-3.5 w-3.5 md:h-4 md:w-4 animate-spin" /> : <Send className="h-3.5 w-3.5 md:h-4 md:w-4" />}
             </Button>
           </div>
         </div>
