@@ -140,7 +140,18 @@ const ForumPost = () => {
 
   const incrementViews = async () => {
     try {
-      await supabase.rpc("increment_post_views", { post_id: id });
+      const { data: currentPost } = await supabase
+        .from("forum_posts")
+        .select("views_count")
+        .eq("id", id)
+        .single();
+
+      if (currentPost) {
+        await supabase
+          .from("forum_posts")
+          .update({ views_count: currentPost.views_count + 1 })
+          .eq("id", id);
+      }
     } catch (error) {
       console.error("Error incrementing views:", error);
     }
