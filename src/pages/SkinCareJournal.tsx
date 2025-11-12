@@ -8,7 +8,19 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Header } from "@/components/Header";
-import { Calendar, Camera, X, Plus, Trash2, Edit2, BookOpen, TrendingUp, BarChart3, PieChart, Sparkles } from "lucide-react";
+import { 
+  Calendar, 
+  Camera, 
+  X, 
+  Plus, 
+  Trash2, 
+  Edit2, 
+  BookOpen, 
+  TrendingUp, 
+  BarChart3, 
+  PieChart, 
+  Sparkles 
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { format, subDays, startOfDay } from "date-fns";
