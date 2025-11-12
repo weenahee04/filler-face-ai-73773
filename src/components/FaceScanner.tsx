@@ -23,32 +23,48 @@ export const FaceScanner = ({ onCapture, onClose }: FaceScannerProps) => {
 
   // Initialize MediaPipe Face Detector
   useEffect(() => {
+    let isMounted = true;
+    
     const initializeFaceDetector = async () => {
       console.log('Initializing MediaPipe Face Detector...');
       
-      // Check WebGL support
-      const canvas = document.createElement('canvas');
-      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-      
-      if (!gl) {
-        console.warn('WebGL not supported, using CPU delegate');
-      }
-      
       try {
+        // Check WebGL support first
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl') as WebGLRenderingContext | null;
+        
+        if (!gl) {
+          throw new Error('WebGL is not supported in this browser');
+        }
+        
+        console.log('WebGL is supported, context:', gl);
+        
+        // Test WebGL context is working
+        try {
+          (gl as WebGLRenderingContext).getParameter((gl as WebGLRenderingContext).VERSION);
+          console.log('WebGL context is working');
+        } catch (e) {
+          throw new Error('WebGL context is not working properly');
+        }
+        
         console.log('Loading vision tasks...');
         const vision = await FilesetResolver.forVisionTasks(
           "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
         );
         
+        if (!isMounted) return;
+        
         console.log('Creating face detector with CPU delegate...');
         const detector = await FaceDetector.createFromOptions(vision, {
           baseOptions: {
             modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite",
-            delegate: "CPU" // Changed from GPU to CPU for better compatibility
+            delegate: "CPU"
           },
           runningMode: "VIDEO",
           minDetectionConfidence: 0.5
         });
+        
+        if (!isMounted) return;
         
         console.log('Face detector initialized successfully');
         setFaceDetector(detector);
@@ -56,10 +72,12 @@ export const FaceScanner = ({ onCapture, onClose }: FaceScannerProps) => {
       } catch (error) {
         console.error("Error initializing face detector:", error);
         
+        if (!isMounted) return;
+        
         let errorMessage = "เบราว์เซอร์ของคุณไม่รองรับการตรวจจับใบหน้า";
         
-        if (error.message && error.message.includes("INTERNAL")) {
-          errorMessage = "กรุณาลองใช้เบราว์เซอร์อื่น เช่น Chrome, Edge หรือ Safari เวอร์ชันล่าสุด";
+        if (error.message && error.message.includes("WebGL")) {
+          errorMessage = "เบราว์เซอร์ของคุณไม่รองรับ WebGL ที่จำเป็นสำหรับการสแกนใบหน้า กรุณาลองใช้เบราว์เซอร์อื่น เช่น Chrome, Edge หรือ Safari เวอร์ชันล่าสุด";
         }
         
         toast({
@@ -68,18 +86,20 @@ export const FaceScanner = ({ onCapture, onClose }: FaceScannerProps) => {
           variant: "destructive",
           duration: 10000
         });
+        
         setIsLoading(false);
         
-        // Close scanner after showing error
+        // Close scanner after showing error to prevent blank screen
         setTimeout(() => {
           onClose();
-        }, 3000);
+        }, 2000);
       }
     };
 
     initializeFaceDetector();
 
     return () => {
+      isMounted = false;
       if (detectionIntervalRef.current) {
         clearInterval(detectionIntervalRef.current);
       }
@@ -158,54 +178,81 @@ export const FaceScanner = ({ onCapture, onClose }: FaceScannerProps) => {
     const primaryHSL = `hsl(${primaryColor})`;
 
     let lastVideoTime = -1;
+    let animationFrameId: number | null = null;
 
     const detectFaces = () => {
-      if (video.currentTime === lastVideoTime) {
-        requestAnimationFrame(detectFaces);
-        return;
-      }
-      lastVideoTime = video.currentTime;
+      try {
+        if (!video || !canvas || !faceDetector) {
+          return;
+        }
 
-      // Set canvas size to match video
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+        if (video.currentTime === lastVideoTime) {
+          animationFrameId = requestAnimationFrame(detectFaces);
+          return;
+        }
+        lastVideoTime = video.currentTime;
 
-      // Clear canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Set canvas size to match video
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
 
-      // Detect faces
-      const detections = faceDetector.detectForVideo(video, Date.now());
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      if (detections.detections.length > 0) {
-        setFaceDetected(true);
+        // Detect faces - wrap in try-catch to prevent crashes
+        try {
+          const detections = faceDetector.detectForVideo(video, Date.now());
 
-        // Draw detection boxes
-        detections.detections.forEach((detection) => {
-          const bbox = detection.boundingBox;
-          if (bbox) {
-            // Draw bounding box with primary color
-            ctx.strokeStyle = primaryHSL;
-            ctx.lineWidth = 3;
-            ctx.strokeRect(bbox.originX, bbox.originY, bbox.width, bbox.height);
+          if (detections.detections.length > 0) {
+            setFaceDetected(true);
 
-            // Draw keypoints
-            detection.keypoints?.forEach((keypoint) => {
-              ctx.fillStyle = primaryHSL;
-              ctx.beginPath();
-              ctx.arc(keypoint.x, keypoint.y, 4, 0, 2 * Math.PI);
-              ctx.fill();
+            // Draw detection boxes
+            detections.detections.forEach((detection) => {
+              const bbox = detection.boundingBox;
+              if (bbox) {
+                // Draw bounding box with primary color
+                ctx.strokeStyle = primaryHSL;
+                ctx.lineWidth = 3;
+                ctx.strokeRect(bbox.originX, bbox.originY, bbox.width, bbox.height);
+
+                // Draw keypoints
+                detection.keypoints?.forEach((keypoint) => {
+                  ctx.fillStyle = primaryHSL;
+                  ctx.beginPath();
+                  ctx.arc(keypoint.x, keypoint.y, 4, 0, 2 * Math.PI);
+                  ctx.fill();
+                });
+              }
             });
+          } else {
+            setFaceDetected(false);
           }
-        });
-      } else {
-        setFaceDetected(false);
-      }
+        } catch (detectionError) {
+          console.error('Error during face detection:', detectionError);
+          // Don't crash, just skip this frame
+        }
 
-      requestAnimationFrame(detectFaces);
+        animationFrameId = requestAnimationFrame(detectFaces);
+      } catch (error) {
+        console.error('Critical error in detection loop:', error);
+        // Stop detection on critical error
+        setIsDetecting(false);
+        toast({
+          title: "เกิดข้อผิดพลาดในการตรวจจับใบหน้า",
+          description: "กรุณาปิดและเปิดกล้องใหม่อีกครั้ง",
+          variant: "destructive"
+        });
+      }
     };
 
     detectFaces();
-  }, [isDetecting, faceDetector]);
+
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
+  }, [isDetecting, faceDetector, toast]);
 
   const capturePhoto = () => {
     if (!videoRef.current) return;
