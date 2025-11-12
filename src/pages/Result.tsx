@@ -171,16 +171,6 @@ const Result = () => {
 
         {/* Main Content for Screenshot */}
         <div ref={resultContentRef}>
-          {/* Header Badge */}
-          <div className="text-center mb-6">
-            <div className="inline-block bg-primary/10 px-6 py-3 rounded-full border-2 border-primary/20 mb-4">
-              <h1 className="text-2xl font-bold text-primary">
-                Pola <span className="text-foreground">AI</span>
-              </h1>
-              <p className="text-sm text-muted-foreground">AI Face Analysis</p>
-            </div>
-          </div>
-
           {/* Uploaded Image */}
           {imageUrl && (
             <div className="mb-6">
