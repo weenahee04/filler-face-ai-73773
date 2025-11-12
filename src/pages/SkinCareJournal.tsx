@@ -373,16 +373,16 @@ const SkinCareJournal = () => {
     <div className="min-h-screen mint-gradient-bg">
       <Header />
       
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-6xl">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
-                <BookOpen className="w-6 h-6 text-primary" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-foreground">สมุดบันทึกการดูแลผิว</h1>
-                <p className="text-muted-foreground">บันทึกการดูแลผิวประจำวันของคุณ</p>
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">สมุดบันทึกการดูแลผิว</h1>
+                <p className="text-sm sm:text-base text-muted-foreground">บันทึกการดูแลผิวประจำวันของคุณ</p>
               </div>
             </div>
             
@@ -394,12 +394,12 @@ const SkinCareJournal = () => {
               }
             }}>
               <DialogTrigger asChild>
-                <Button className="bg-primary hover:bg-primary-hover">
+                <Button className="bg-primary hover:bg-primary-hover w-full sm:w-auto">
                   <Plus className="w-4 h-4 mr-2" />
                   เพิ่มบันทึกใหม่
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>
                     {editingEntry ? "แก้ไขบันทึก" : "เพิ่มบันทึกใหม่"}
@@ -460,7 +460,7 @@ const SkinCareJournal = () => {
                   {/* Mood */}
                   <div className="space-y-2">
                     <Label>อารมณ์วันนี้</Label>
-                    <div className="flex gap-2">
+                    <div className="grid grid-cols-2 sm:flex gap-2">
                       {MOODS.map(m => (
                         <Button
                           key={m.value}
@@ -469,8 +469,8 @@ const SkinCareJournal = () => {
                           onClick={() => setMood(m.value)}
                           className="flex-1"
                         >
-                          <span className="text-2xl mr-2">{m.emoji}</span>
-                          {m.label}
+                          <span className="text-xl sm:text-2xl mr-1 sm:mr-2">{m.emoji}</span>
+                          <span className="text-xs sm:text-sm">{m.label}</span>
                         </Button>
                       ))}
                     </div>
@@ -531,7 +531,7 @@ const SkinCareJournal = () => {
                   </div>
                 </div>
 
-                <div className="flex gap-2 justify-end">
+                <div className="flex flex-col sm:flex-row gap-2 justify-end">
                   <Button
                     variant="outline"
                     onClick={() => {
@@ -539,13 +539,14 @@ const SkinCareJournal = () => {
                       setEditingEntry(null);
                       resetForm();
                     }}
+                    className="w-full sm:w-auto"
                   >
                     ยกเลิก
                   </Button>
                   <Button
                     onClick={handleSaveEntry}
                     disabled={saving}
-                    className="bg-primary hover:bg-primary-hover"
+                    className="bg-primary hover:bg-primary-hover w-full sm:w-auto"
                   >
                     {saving ? "กำลังบันทึก..." : "บันทึก"}
                   </Button>
@@ -557,58 +558,58 @@ const SkinCareJournal = () => {
 
         {/* Statistics Section */}
         {statistics && entries.length > 0 && (
-          <div className="mb-8 space-y-6">
+          <div className="mb-6 sm:mb-8 space-y-4 sm:space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-foreground mb-2">สถิติการดูแลผิว</h2>
-              <p className="text-muted-foreground">ข้อมูลสรุปจากการบันทึกของคุณ</p>
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-1 sm:mb-2">สถิติการดูแลผิว</h2>
+              <p className="text-sm sm:text-base text-muted-foreground">ข้อมูลสรุปจากการบันทึกของคุณ</p>
             </div>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               <Card className="glass-card">
-                <CardContent className="pt-6">
+                <CardContent className="pt-4 sm:pt-6">
                   <div className="text-center">
-                    <BookOpen className="w-8 h-8 mx-auto mb-2 text-primary" />
-                    <div className="text-3xl font-bold text-foreground">{statistics.totalEntries}</div>
-                    <p className="text-sm text-muted-foreground">รายการบันทึก</p>
+                    <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2 text-primary" />
+                    <div className="text-2xl sm:text-3xl font-bold text-foreground">{statistics.totalEntries}</div>
+                    <p className="text-xs sm:text-sm text-muted-foreground">รายการบันทึก</p>
                   </div>
                 </CardContent>
               </Card>
 
               <Card className="glass-card">
-                <CardContent className="pt-6">
+                <CardContent className="pt-4 sm:pt-6">
                   <div className="text-center">
-                    <Sparkles className="w-8 h-8 mx-auto mb-2 text-secondary" />
-                    <div className="text-3xl font-bold text-foreground">{statistics.totalProducts}</div>
-                    <p className="text-sm text-muted-foreground">ผลิตภัณฑ์ทั้งหมด</p>
+                    <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2 text-secondary" />
+                    <div className="text-2xl sm:text-3xl font-bold text-foreground">{statistics.totalProducts}</div>
+                    <p className="text-xs sm:text-sm text-muted-foreground">ผลิตภัณฑ์ทั้งหมด</p>
                   </div>
                 </CardContent>
               </Card>
 
               <Card className="glass-card">
-                <CardContent className="pt-6">
+                <CardContent className="pt-4 sm:pt-6">
                   <div className="text-center">
-                    <TrendingUp className="w-8 h-8 mx-auto mb-2 text-green-500" />
-                    <div className="text-3xl font-bold text-foreground">
+                    <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2 text-green-500" />
+                    <div className="text-2xl sm:text-3xl font-bold text-foreground">
                       {statistics.skinTrends.length}
                     </div>
-                    <p className="text-sm text-muted-foreground">วันที่บันทึก (30 วัน)</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">วันที่บันทึก (30 วัน)</p>
                   </div>
                 </CardContent>
               </Card>
 
               <Card className="glass-card">
-                <CardContent className="pt-6">
+                <CardContent className="pt-4 sm:pt-6">
                   <div className="text-center">
                     {statistics.moodData[0] && (
                       <>
-                        <div className="text-4xl mb-2">
+                        <div className="text-3xl sm:text-4xl mb-1 sm:mb-2">
                           {MOODS.find(m => m.label === statistics.moodData[0].name)?.emoji}
                         </div>
-                        <div className="text-lg font-bold text-foreground">
+                        <div className="text-base sm:text-lg font-bold text-foreground">
                           {statistics.moodData[0].name}
                         </div>
-                        <p className="text-sm text-muted-foreground">อารมณ์ส่วนใหญ่</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">อารมณ์ส่วนใหญ่</p>
                       </>
                     )}
                   </div>
@@ -617,29 +618,29 @@ const SkinCareJournal = () => {
             </div>
 
             {/* Charts */}
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
               {/* Skin Condition Trends */}
               {statistics.skinTrends.length > 0 && (
                 <Card className="glass-card">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <TrendingUp className="w-5 h-5 text-primary" />
-                      แนวโน้มอาการผิวหน้า (30 วันล่าสุด)
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                      <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                      <span className="text-sm sm:text-base">แนวโน้มอาการผิวหน้า (30 วันล่าสุด)</span>
                     </CardTitle>
-                    <CardDescription>ติดตามการเปลี่ยนแปลงของผิวหน้า</CardDescription>
+                    <CardDescription className="text-xs sm:text-sm">ติดตามการเปลี่ยนแปลงของผิวหน้า</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
+                    <ResponsiveContainer width="100%" height={250}>
                       <LineChart data={statistics.skinTrends}>
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                         <XAxis 
                           dataKey="date" 
                           stroke="hsl(var(--foreground))"
-                          style={{ fontSize: '12px' }}
+                          style={{ fontSize: '10px' }}
                         />
                         <YAxis 
                           stroke="hsl(var(--foreground))"
-                          style={{ fontSize: '12px' }}
+                          style={{ fontSize: '10px' }}
                         />
                         <Tooltip
                           contentStyle={{
@@ -679,28 +680,28 @@ const SkinCareJournal = () => {
               {/* Top Products */}
               {statistics.topProducts.length > 0 && (
                 <Card className="glass-card">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <BarChart3 className="w-5 h-5 text-secondary" />
-                      ผลิตภัณฑ์ที่ใช้บ่อยที่สุด
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                      <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-secondary" />
+                      <span className="text-sm sm:text-base">ผลิตภัณฑ์ที่ใช้บ่อยที่สุด</span>
                     </CardTitle>
-                    <CardDescription>10 อันดับแรก</CardDescription>
+                    <CardDescription className="text-xs sm:text-sm">10 อันดับแรก</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
+                    <ResponsiveContainer width="100%" height={250}>
                       <BarChart data={statistics.topProducts} layout="horizontal">
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                         <XAxis 
                           type="number"
                           stroke="hsl(var(--foreground))"
-                          style={{ fontSize: '12px' }}
+                          style={{ fontSize: '10px' }}
                         />
                         <YAxis 
                           type="category"
                           dataKey="name" 
-                          width={100}
+                          width={80}
                           stroke="hsl(var(--foreground))"
-                          style={{ fontSize: '11px' }}
+                          style={{ fontSize: '9px' }}
                         />
                         <Tooltip
                           contentStyle={{
@@ -719,15 +720,15 @@ const SkinCareJournal = () => {
               {/* Mood Distribution */}
               {statistics.moodData.length > 0 && (
                 <Card className="glass-card">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <PieChart className="w-5 h-5 text-green-500" />
-                      การกระจายอารมณ์
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                      <PieChart className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
+                      <span className="text-sm sm:text-base">การกระจายอารมณ์</span>
                     </CardTitle>
-                    <CardDescription>สัดส่วนอารมณ์ทั้งหมด</CardDescription>
+                    <CardDescription className="text-xs sm:text-sm">สัดส่วนอารมณ์ทั้งหมด</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
+                    <ResponsiveContainer width="100%" height={250}>
                       <RechartsPie>
                         <Pie
                           data={statistics.moodData}
@@ -759,25 +760,25 @@ const SkinCareJournal = () => {
               {/* Top Skin Conditions */}
               {statistics.topConditions.length > 0 && (
                 <Card className="glass-card">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <BarChart3 className="w-5 h-5 text-orange-500" />
-                      อาการผิวที่พบบ่อย
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                      <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />
+                      <span className="text-sm sm:text-base">อาการผิวที่พบบ่อย</span>
                     </CardTitle>
-                    <CardDescription>อาการที่พบเจอบ่อยที่สุด</CardDescription>
+                    <CardDescription className="text-xs sm:text-sm">อาการที่พบเจอบ่อยที่สุด</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
+                    <ResponsiveContainer width="100%" height={250}>
                       <BarChart data={statistics.topConditions}>
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                         <XAxis 
                           dataKey="name"
                           stroke="hsl(var(--foreground))"
-                          style={{ fontSize: '12px' }}
+                          style={{ fontSize: '10px' }}
                         />
                         <YAxis 
                           stroke="hsl(var(--foreground))"
-                          style={{ fontSize: '12px' }}
+                          style={{ fontSize: '10px' }}
                         />
                         <Tooltip
                           contentStyle={{
@@ -816,60 +817,62 @@ const SkinCareJournal = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-6">
+          <div className="grid gap-4 sm:gap-6">
             {entries.map((entry) => (
               <Card key={entry.id} className="glass-card hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
+                <CardHeader className="pb-3 sm:pb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                     <div className="flex-1">
-                      <CardTitle className="flex items-center gap-2">
-                        <Calendar className="w-5 h-5 text-primary" />
-                        {format(new Date(entry.journal_date), "d MMMM yyyy", { locale: th })}
+                      <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                        <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                        <span className="text-sm sm:text-base">{format(new Date(entry.journal_date), "d MMMM yyyy", { locale: th })}</span>
                       </CardTitle>
-                      <CardDescription className="mt-2">
+                      <CardDescription className="mt-1 sm:mt-2 text-xs sm:text-sm">
                         {entry.mood && (
-                          <span className="text-2xl mr-2">
+                          <span className="text-xl sm:text-2xl mr-2">
                             {MOODS.find(m => m.value === entry.mood)?.emoji}
                           </span>
                         )}
                         {format(new Date(entry.created_at), "เวลา HH:mm น.", { locale: th })}
                       </CardDescription>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 self-end sm:self-start">
                       <Button
                         variant="outline"
-                        size="icon"
+                        size="sm"
                         onClick={() => handleEditEntry(entry)}
+                        className="h-8 w-8 p-0 sm:h-9 sm:w-9"
                       >
-                        <Edit2 className="w-4 h-4" />
+                        <Edit2 className="w-3 h-3 sm:w-4 sm:h-4" />
                       </Button>
                       <Button
                         variant="outline"
-                        size="icon"
+                        size="sm"
                         onClick={() => handleDeleteEntry(entry.id)}
+                        className="h-8 w-8 p-0 sm:h-9 sm:w-9"
                       >
-                        <Trash2 className="w-4 h-4 text-destructive" />
+                        <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 text-destructive" />
                       </Button>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3 sm:space-y-4">
                   {entry.image_url && (
                     <img
                       src={entry.image_url}
                       alt="Journal entry"
-                      className="w-full h-64 object-cover rounded-lg"
+                      className="w-full h-48 sm:h-64 object-cover rounded-lg"
                     />
                   )}
 
                   {entry.products_used.length > 0 && (
                     <div>
-                      <h4 className="font-semibold mb-2 text-sm text-muted-foreground">
+                      <h4 className="font-semibold mb-1.5 sm:mb-2 text-xs sm:text-sm text-muted-foreground">
                         ผลิตภัณฑ์ที่ใช้
                       </h4>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-1.5 sm:gap-2">
                         {entry.products_used.map((product, idx) => (
-                          <Badge key={idx} variant="secondary">
+                          <Badge key={idx} variant="secondary" className="text-xs">
                             {product}
                           </Badge>
                         ))}
@@ -879,7 +882,7 @@ const SkinCareJournal = () => {
 
                   {entry.skin_conditions.length > 0 && (
                     <div>
-                      <h4 className="font-semibold mb-2 text-sm text-muted-foreground">
+                      <h4 className="font-semibold mb-1.5 sm:mb-2 text-xs sm:text-sm text-muted-foreground">
                         อาการผิวหน้า
                       </h4>
                       <div className="flex flex-wrap gap-2">
