@@ -24,3 +24,6 @@ verify_jwt = false
 
 [functions.generate-after-image]
 verify_jwt = false
+
+[functions.skin-analysis]
+verify_jwt = false

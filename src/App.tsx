@@ -10,6 +10,7 @@ import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
 import Consultation from "./pages/Consultation";
 import AgeProgression from "./pages/AgeProgression";
+import SkinAnalysis from "./pages/SkinAnalysis";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/consultation" element={<Consultation />} />
           <Route path="/age-progression" element={<AgeProgression />} />
+          <Route path="/skin-analysis" element={<SkinAnalysis />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

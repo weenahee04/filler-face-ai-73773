@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Menu, MessageCircle, LogOut, User, UserCircle, Clock } from "lucide-react";
+import { Menu, MessageCircle, LogOut, User, UserCircle, Clock, Sparkles } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -179,6 +179,10 @@ export const Header = () => {
                     <Clock className="w-4 h-4 mr-2" />
                     ดูหน้าในอนาคต
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/skin-analysis")}>
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    วิเคราะห์ผิวหน้า
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
                     <LogOut className="w-4 h-4 mr-2" />
@@ -246,6 +250,18 @@ export const Header = () => {
               >
                 <Clock className="w-4 h-4 mr-2" />
                 ดูหน้าในอนาคต
+              </Button>
+
+              <Button 
+                variant="ghost"
+                onClick={() => {
+                  navigate("/skin-analysis");
+                  setMobileMenuOpen(false);
+                }}
+                className="text-sm font-medium justify-start"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                วิเคราะห์ผิวหน้า
               </Button>
 
               {user ? (
