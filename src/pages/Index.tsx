@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import html2canvas from "html2canvas";
 import { ResultImage } from "@/components/ResultImage";
 import { FaceScanner } from "@/components/FaceScanner";
+import { Header } from "@/components/Header";
 const Index = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string>('');
@@ -317,6 +318,8 @@ const Index = () => {
     navigate(`/profile/${analysisId}`);
   };
   return <div className="min-h-screen mint-gradient-bg">
+      <Header />
+      
       {/* Face Scanner */}
       {showFaceScanner && <FaceScanner onCapture={handleFaceCapture} onClose={() => setShowFaceScanner(false)} />}
 
@@ -420,26 +423,7 @@ const Index = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Header */}
-      <header className="bg-primary text-white shadow-lg sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-2.5">
-          <div className="flex items-center justify-between">
-            <div className="flex-1 text-center">
-              <h1 className="text-lg md:text-xl font-bold tracking-wide">
-                วิเคราะห์ใบหน้าด้วย AI
-              </h1>
-              <p className="text-xs md:text-sm text-white/90 mt-0.5">
-                AI วิเคราะห์ใบหน้าและแนะนำฟิลเลอร์
-              </p>
-            </div>
-            <Button onClick={() => navigate("/how-to-use")} variant="ghost" className="text-white hover:bg-white/20 flex-shrink-0" title="วิธีการใช้งาน">
-              <Info className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      <div className="container mx-auto px-4 py-6 max-w-6xl">
+      <div className="container mx-auto px-4 py-6 max-w-6xl pt-24">
         {/* Info Badge */}
         <div className="mb-6 flex justify-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 glass-card rounded-full shadow-soft border border-border">
